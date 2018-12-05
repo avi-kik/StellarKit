@@ -19,6 +19,7 @@ public final class TxBuilder {
     private var timeBounds: TimeBounds?
     private var operations = [Operation]()
     private var signers = [Account]()
+    private var opsToSign = [(Int, Account)]()
 
     public init(source: Account, node: Stellar.Node) {
         self.source = source
@@ -97,6 +98,13 @@ public final class TxBuilder {
         return self
     }
 
+    @discardableResult
+    public func signOperation(at index: Int, with account: Account) -> TxBuilder {
+        opsToSign.append((index, account))
+
+        return self
+    }
+
     public func tx() -> Promise<Transaction> {
         let p = Promise<Transaction>()
 
@@ -110,6 +118,8 @@ public final class TxBuilder {
 
         Stellar.sequence(account: sourceKey, seqNum: sequence, node: node)
             .then { sequence in
+                self.sequence = sequence
+
                 self.calculatedFee()
                     .then({
                         p.signal(Transaction(sourceAccount: pk,
@@ -158,7 +168,7 @@ public final class TxBuilder {
                 Promise(UInt32(self.operations.count) * params.baseFee)
             })
     }
-    
+
     private func sign(tx: Transaction, networkId: String) throws -> TransactionEnvelope {
         var sigs = [DecoratedSignature]()
 
@@ -182,6 +192,42 @@ public final class TxBuilder {
                 }())
         })
 
+        for (index, signer) in opsToSign {
+            try sigs.append(sign(op: self.operations[index], at: index, with: signer))
+        }
+
         return TransactionEnvelope(tx: tx, signatures: sigs)
+    }
+
+    private func sign(op: Operation, at index: Int, with signer: Account) throws -> DecoratedSignature {
+        guard let sourceKey = source.publicKey else {
+            throw StellarError.missingPublicKey
+        }
+
+        let pk = PublicKey.PUBLIC_KEY_TYPE_ED25519(WD32(KeyUtils.key(base32: sourceKey)))
+
+        guard let data = node.networkId.description.data(using: .utf8)?.sha256 else {
+            throw StellarError.dataEncodingFailed
+        }
+
+        let m =
+            try XDREncoder.encode(OperationSignaturePayload(networkId: WD32(data),
+                                                            txSourceAccount: pk,
+                                                            seqNum: sequence,
+                                                            slot: Int32(index),
+                                                            taggedOperation: .ENVELOPE_TYPE_OP(op)))
+                .sha256
+
+        guard let sign = signer.sign else {
+            throw StellarError.missingSignClosure
+        }
+
+        guard let publicKey = signer.publicKey else {
+            throw StellarError.missingPublicKey
+        }
+
+        let hint = WrappedData4(KeyUtils.key(base32: publicKey).suffix(4))
+
+        return try DecoratedSignature(hint: hint, signature: sign(m))
     }
 }

@@ -194,6 +194,7 @@ struct EnvelopeType {
     static let ENVELOPE_TYPE_SCP: Int32 = 1
     static let ENVELOPE_TYPE_TX: Int32 = 2
     static let ENVELOPE_TYPE_AUTH: Int32 = 3
+    static let ENVELOPE_TYPE_OP: Int32 = 4
 }
 
 struct TransactionSignaturePayload: XDREncodableStruct {
@@ -254,5 +255,54 @@ public struct TransactionEnvelope: XDRCodable, XDREncodableStruct {
     init(tx: Transaction, signatures: [DecoratedSignature]) {
         self.tx = tx
         self.signatures = signatures
+    }
+}
+
+struct OperationSignaturePayload: XDREncodableStruct {
+    let networkId: WrappedData32
+    let txSourceAccount: PublicKey
+    let seqNum: UInt64
+    let slot: Int32
+    let taggedOperation: TaggedOperation
+
+    var op: Operation? {
+        if case let .ENVELOPE_TYPE_OP(op) = taggedOperation {
+            return op
+        }
+
+        return nil
+    }
+
+    enum TaggedOperation: XDREncodable {
+        case ENVELOPE_TYPE_OP(Operation)
+
+        private func discriminant() -> Int32 {
+            switch self {
+            case .ENVELOPE_TYPE_OP: return EnvelopeType.ENVELOPE_TYPE_OP
+            }
+        }
+
+        func encode(to encoder: XDREncoder) throws {
+            try encoder.encode(discriminant())
+
+            switch self {
+            case .ENVELOPE_TYPE_OP(let op): try encoder.encode(op)
+            }
+        }
+    }
+}
+
+public struct OperationEnvelope: XDRCodable, XDREncodableStruct {
+    let op: Operation
+    let signature: DecoratedSignature
+
+    public init(from decoder: XDRDecoder) throws {
+        op = try decoder.decode(Operation.self)
+        signature = try decoder.decode(DecoratedSignature.self)
+    }
+
+    init(op: Operation, signature: DecoratedSignature) {
+        self.op = op
+        self.signature = signature
     }
 }

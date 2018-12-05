@@ -58,40 +58,38 @@ class StellarBaseTests: XCTestCase {
         account2 = MockStellarAccount()
         issuer = MockStellarAccount(seedStr: "SAXSDD5YEU6GMTJ5IHA6K35VZHXFVPV6IHMWYAQPSEKJRNC5LGMUQX35")
         funder = MockStellarAccount(seedStr: "SDBDJVXHPVQGDXYHEVOBBV4XZUDD7IQTXM5XHZRLXRJVY5YMH4YUCNZC")
-
-        createAssetAccount()
     }
     
     override func tearDown() {
         super.tearDown()
     }
 
-    func createAssetAccount() {
-        let e = expectation(description: "setup")
+    func test_op_sig() {
+        let e = expectation(description: "")
 
-        Stellar.balance(account: issuer.publicKey!, asset: asset, node: node)
+        let a1 = MockStellarAccount(seedStr: "SBE2LMR4Y3EBN7EUFSEYL4X7P45HXD27LMQLJAJKLOVZ4BRA5QY6KVAL")
+        let a2 = MockStellarAccount(seedStr: "SBYQ56GKLATD6ZCPSH5MUFSIBJQOS2RV7TD7CFLTFK2C5IODTARIKTBZ")
+
+        let x = TxBuilder(source: a1, node: node)
+            .add(operation: StellarKit.Operation.payment(destination: a1.publicKey!,
+                                                         amount: 1,
+                                                         asset: .ASSET_TYPE_NATIVE,
+                                                         source: a2))
+            .signOperation(at: 0, with: a2)
+
+        x
+            .post()
             .then { _ in e.fulfill() }
-            .error({ _ in
-                TxBuilder(source: self.funder, node: self.node)
-                    .add(operation: StellarKit.Operation
-                        .createAccount(destination: self.issuer.publicKey!, balance: 100 * 100_000))
-                    .post()
-                    .then({ _ -> Promise<Responses.TransactionSuccess> in
-                        return TxBuilder(source: self.issuer, node: self.node)
-                            .add(operation: StellarKit.Operation.changeTrust(asset: self.asset))
-                            .post()
-                    })
-                    .then { _ in e.fulfill() }
+            .error ({
+                if let e = $0 as? Responses.RequestFailure, let r = e.transactionResult {
+                    print(r)
+                }
+                else {
+                    print($0)
+                }
             })
 
-        wait(for: [ e ], timeout: 3.0)
-    }
-
-    func fund(account: String) -> Promise<String> {
-        return TxBuilder(source: funder, node: node)
-            .add(operation: StellarKit.Operation.createAccount(destination: account, balance: 100 * 100_000))
-            .post()
-            .then { return Promise($0.hash) }
+        wait(for: [e], timeout: 10.0)
     }
 
     func test_network_parameters() {

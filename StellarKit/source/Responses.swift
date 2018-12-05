@@ -27,7 +27,7 @@ public enum Responses {
     }
 
     public struct TransactionSuccess: Decodable {
-        let hash: String
+        public let hash: String
         let resultXDR: String
 
         enum CodingKeys: String, CodingKey {
@@ -187,7 +187,7 @@ public enum Responses {
 }
 
 extension Responses.RequestFailure {
-    var transactionResult: TransactionResult? {
+    public var transactionResult: TransactionResult? {
         if
             let resultXDR = extras?.resultXDR,
             let data = Data(base64Encoded: resultXDR)
@@ -200,7 +200,7 @@ extension Responses.RequestFailure {
 }
 
 extension Responses.TransactionSuccess {
-    var transactionResult: TransactionResult? {
+    public var transactionResult: TransactionResult? {
         if let data = Data(base64Encoded: resultXDR) {
             return try? XDRDecoder(data: data).decode(TransactionResult.self)
         }

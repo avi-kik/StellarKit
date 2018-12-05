@@ -119,6 +119,20 @@ public struct TransactionResult: XDRCodable, XDREncodableStruct {
     }
 }
 
+public extension TransactionResult {
+    var operationResults: [OperationResult]? {
+        if case let  Result.txSUCCESS(opResults) = result {
+            return opResults
+        }
+
+        if case let  Result.txFAILED(opResults) = result {
+            return opResults
+        }
+
+        return nil
+    }
+}
+
 struct OperationResultCode {
     static let opINNER: Int32 = 0       // inner object result is valid
 
@@ -209,7 +223,7 @@ public enum OperationResult: XDRCodable {
     }
 }
 
-public struct CreateAccountResultCode {
+struct CreateAccountResultCode {
     public static let CREATE_ACCOUNT_SUCCESS: Int32 = 0        // account was created
 
     public static let CREATE_ACCOUNT_MALFORMED: Int32 = -1     // invalid destination
@@ -218,27 +232,21 @@ public struct CreateAccountResultCode {
     public static let CREATE_ACCOUNT_ALREADY_EXIST: Int32 = -4 // account already exists
 }
 
-public enum CreateAccountResult: XDRCodable {
-    case success
-    case failure (Int32)
-
-    private func discriminant() -> Int32 {
-        switch self {
-        case .success:
-            return CreateAccountResultCode.CREATE_ACCOUNT_SUCCESS
-        case .failure (let code):
-            return code
-        }
-    }
+public enum CreateAccountResult: Int32, XDRCodable {
+    case success = 0
+    case malformed = -1
+    case underfunded = -2
+    case lowReserve = -3
+    case alreadyExists = -4
 
     public func encode(to encoder: XDREncoder) throws {
-        try encoder.encode(discriminant())
+        try encoder.encode(self.rawValue)
     }
 
     public init(from decoder: XDRDecoder) throws {
         let value = try decoder.decode(Int32.self)
 
-        self = value == 0 ? .success : .failure(value)
+        self.init(rawValue: value)!
     }
 }
 

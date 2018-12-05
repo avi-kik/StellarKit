@@ -119,6 +119,20 @@ public struct TransactionResult: XDRCodable, XDREncodableStruct {
     }
 }
 
+public extension TransactionResult {
+    var operationResults: [OperationResult]? {
+        if case let  Result.txSUCCESS(opResults) = result {
+            return opResults
+        }
+
+        if case let  Result.txFAILED(opResults) = result {
+            return opResults
+        }
+
+        return nil
+    }
+}
+
 struct OperationResultCode {
     static let opINNER: Int32 = 0       // inner object result is valid
 

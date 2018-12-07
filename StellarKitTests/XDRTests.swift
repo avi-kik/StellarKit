@@ -50,7 +50,7 @@ class XDRTests: XCTestCase {
     func test_array() {
         let a: [UInt8] = [123]
         let x = try! XDREncoder.encode(a)
-        try! XCTAssertEqual(a, XDRDecoder(data: x).decodeArray(UInt8.self))
+        try! XCTAssertEqual(a, XDRDecoder(data: x).decode([UInt8].self))
     }
 
     func test_string_padded() {
@@ -68,13 +68,13 @@ class XDRTests: XCTestCase {
     func test_optional_not_nil() {
         let a: UInt8? = 123
         let x = try! XDREncoder.encode(a)
-        try! XCTAssertEqual(a, XDRDecoder(data: x).decodeArray(UInt8.self).first)
+        try! XCTAssertEqual(a, XDRDecoder.decode(UInt8?.self, data: x))
     }
 
     func test_optional_nil() {
         let a: UInt8? = nil
         let x = try! XDREncoder.encode(a)
-        try! XCTAssertEqual(a, XDRDecoder(data: x).decodeArray(UInt8.self).first)
+        try! XCTAssertEqual(a, XDRDecoder.decode(UInt8?.self, data: x))
     }
 
     func test_data() {
@@ -86,31 +86,31 @@ class XDRTests: XCTestCase {
     func test_optional_data() {
         let a: Data? = Data(bytes: [123])
         let x = try! XDREncoder.encode(a)
-        try! XCTAssertEqual(a, XDRDecoder(data: x).decodeArray(Data.self).first)
+
+        try! XCTAssertEqual(a, XDRDecoder(data: x).decode(Data?.self))
     }
 
     func test_struct() {
         struct S: XDRCodable, XDREncodableStruct {
-            let a: Int32
-            let b: String
+            let a: String
+            let b: Int32
 
             init(from decoder: XDRDecoder) throws {
-                a = try decoder.decode(Int32.self)
-                b = try decoder.decode(String.self)
+                a = try decoder.decode(String.self)
+                b = try decoder.decode(Int32.self)
             }
 
-            init(a: Int32, b: String) {
+            init(a: String, b: Int32) {
                 self.a = a
                 self.b = b
             }
         }
 
-        let s = S(a: 123, b: "a")
-        let x = try! XDREncoder.encode(s)
-        let s2 = try! XDRDecoder(data: x).decode(S.self)
+        let s = S(a: "a", b: 123)
+        let s2 = try! XDRDecoder(data: XDREncoder.encode(s)).decode(S.self)
 
-        XCTAssertEqual(s.a, s2.a)
         XCTAssertEqual(s.b, s2.b)
+        XCTAssertEqual(s.a, s2.a)
     }
 
 }

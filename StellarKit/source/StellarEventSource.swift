@@ -98,9 +98,7 @@ public final class StellarEventSource: NSObject, URLSessionDataDelegate {
     }
 
     private func extractLines() {
-        guard lineEnding != "" else {
-            return
-        }
+        guard lineEnding != "" else { return }
 
         while let location = stringAccumulator.range(of: lineEnding)?.lowerBound {
             let s: Substring = stringAccumulator[..<location]

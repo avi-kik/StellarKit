@@ -1,5 +1,5 @@
 //
-// JSONRequest.swift
+// HorizonRequest.swift
 // StellarKit
 //
 // Created by Kin Foundation.
@@ -36,7 +36,7 @@ class HorizonRequest: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate {
 
     private struct E: Error { let horizonError: Responses.RequestFailure }
 
-    func load<T: Decodable>(url: URL) -> Promise<T> {
+    func get<T: Decodable>(url: URL) -> Promise<T> {
         let p = Promise<T>()
 
         let task = session.dataTask(with: url)
@@ -104,28 +104,32 @@ extension HorizonRequest {
     }
 }
 
-extension EP.AccountsEndpoint {
-    public func load(from base: URL, using: HorizonRequest? = nil) -> Promise<Responses.AccountDetails> {
-        return (using ?? HorizonRequest()).load(url: url(with: base))
+extension EP.AccountEndpoint {
+    public func get(from base: URL, using: HorizonRequest? = nil) -> Promise<Responses.AccountDetails> {
+        return (using ?? HorizonRequest()).get(url: url(with: base))
     }
 }
 
 extension EP.LedgersEndpoint {
-    public func load(from base: URL, using: HorizonRequest? = nil) -> Promise<Responses.Ledgers> {
-        return (using ?? HorizonRequest()).load(url: url(with: base))
+    public func get(from base: URL, using: HorizonRequest? = nil) -> Promise<Responses.Ledgers> {
+        return (using ?? HorizonRequest()).get(url: url(with: base))
     }
+}
 
-    public func load(from base: URL, using: HorizonRequest? = nil) -> Promise<Responses.Ledger> {
-        return (using ?? HorizonRequest()).load(url: url(with: base))
+extension EP.LedgerEndpoint {
+    public func get(from base: URL, using: HorizonRequest? = nil) -> Promise<Responses.Ledger> {
+        return (using ?? HorizonRequest()).get(url: url(with: base))
     }
 }
 
 extension EP.TransactionsEndpoint {
-    public func load(from base: URL, using: HorizonRequest? = nil) -> Promise<Responses.Transactions> {
-        return (using ?? HorizonRequest()).load(url: url(with: base))
+    public func get(from base: URL, using: HorizonRequest? = nil) -> Promise<Responses.Transactions> {
+        return (using ?? HorizonRequest()).get(url: url(with: base))
     }
+}
 
-    public func load(from base: URL, using: HorizonRequest? = nil) -> Promise<Responses.Transaction> {
-        return (using ?? HorizonRequest()).load(url: url(with: base))
+extension EP.TransactionEndpoint {
+    public func get(from base: URL, using: HorizonRequest? = nil) -> Promise<Responses.Transaction> {
+        return (using ?? HorizonRequest()).get(url: url(with: base))
     }
 }

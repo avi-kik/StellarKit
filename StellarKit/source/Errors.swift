@@ -9,19 +9,12 @@
 import Foundation
 
 public enum StellarError: Error {
-    case memoTooLong (Any?)
-    case missingAccount
-    case missingPublicKey
-    case missingHash
-    case missingSequence
+    case memoTooLong(Any?)
     case missingBalance
-    case missingSignClosure
     case urlEncodingFailed
     case dataEncodingFailed
+    case dataDecodingFailed
     case signingFailed
-    case destinationNotReadyForAsset (Error, String?)
-    case unknownError (Any?)
-    case internalInconsistency
 }
 
 extension StellarError: LocalizedError {

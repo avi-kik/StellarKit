@@ -15,22 +15,53 @@ enum Option: Hashable {
     case order(Order)
     case limit(Int)
     case cursor(String)
+    case null
 }
 
-protocol EndpointProtocol {
-    var components: [EP] { get }
+protocol CollectionQueryable {
     var options: Set<Option> { get }
-
-    func url(with base: URL) -> URL
-
-    init(_ eps: [EP], options: Set<Option>)
 
     func order(_ order: Option.Order) -> Self
     func limit(_ limit: Int) -> Self
     func cursor(_ cursor: String?) -> Self
 }
 
-extension EndpointProtocol {
+protocol EndpointProtocol {
+    var components: [EP] { get }
+
+    func url(with base: URL) -> URL
+}
+
+protocol SimpleEndpoint: EndpointProtocol { }
+
+extension SimpleEndpoint {
+    func url(with base: URL) -> URL {
+        var path = ""
+
+        for component in components {
+            switch component {
+            case .accounts(let account):
+                path += "accounts/\(account)"
+            case .ledgers(let num):
+                path += (path.isEmpty ? "" : "/") + "ledgers" + (num != nil ? "/\(num!)" : "")
+            case .operations(let num):
+                path += (path.isEmpty ? "" : "/") + "operations" + (num != nil ? "/\(num!)" : "")
+            case .payments:
+                path += (path.isEmpty ? "" : "/") + "payments"
+            case .transactions(let id):
+                path += (path.isEmpty ? "" : "/") + "transactions" + (id != nil ? "/\(id!)" : "")
+            }
+        }
+
+        return URL(string: "\(base.absoluteString)/\(path)")!
+    }
+}
+
+protocol CollectionEndpoint: SimpleEndpoint, CollectionQueryable {
+    init(_ eps: [EP], options: Set<Option>)
+}
+
+extension CollectionEndpoint {
     func url(with base: URL) -> URL {
         var path = ""
 
@@ -58,6 +89,8 @@ extension EndpointProtocol {
                 params += (params.count == 1 ? "" : "&") + "limit=\(limit)"
             case .cursor(let cursor):
                 params += (params.count == 1 ? "" : "&") + "cursor=\(cursor)"
+            case .null:
+                break
             }
         }
 
@@ -65,7 +98,7 @@ extension EndpointProtocol {
     }
 }
 
-extension EndpointProtocol {
+extension CollectionEndpoint {
     func order(_ order: Option.Order) -> Self {
         return Self.init(components, options: options.union([Option.order(order)]))
     }
@@ -76,7 +109,7 @@ extension EndpointProtocol {
 
     func cursor(_ cursor: String?) -> Self {
         return Self.init(components,
-                         options: cursor != nil ? options.union([Option.cursor(cursor!)]) : options)
+                         options: options.union([cursor != nil ? Option.cursor(cursor!) : .null]))
     }
 }
 
@@ -87,32 +120,47 @@ enum EP {
     case payments
     case transactions(String?)
 
-    struct AccountsEndpoint: EndpointProtocol {
+    struct AccountEndpoint: SimpleEndpoint {
         let components: [EP]
-        let options: Set<Option> = Set()
-
-        init(_ eps: [EP], options: Set<Option>) {
-            fatalError("account must be first")
-        }
 
         init(account: String?) {
             components = account != nil ? [.accounts(account!)] : []
         }
 
         func operations() -> OperationsEndpoint {
-            return EP.OperationsEndpoint(components, options: options)
+            return EP.OperationsEndpoint(components, options: [])
         }
 
         func payments() -> PaymentsEndpoint {
-            return EP.PaymentsEndpoint(components, options: options)
+            return EP.PaymentsEndpoint(components, options: [])
         }
 
         func transactions() -> TransactionsEndpoint {
-            return EP.TransactionsEndpoint(components, options: options)
+            return EP.TransactionsEndpoint(components, options: [])
         }
     }
 
-    struct LedgersEndpoint: EndpointProtocol {
+    struct LedgerEndpoint: SimpleEndpoint {
+        let components: [EP]
+
+        init(ledger: Int) {
+            components = [.ledgers(ledger)]
+        }
+
+        func operations() -> OperationsEndpoint {
+            return EP.OperationsEndpoint(components, options: [])
+        }
+
+        func payments() -> PaymentsEndpoint {
+            return EP.PaymentsEndpoint(components, options: [])
+        }
+
+        func transactions() -> TransactionsEndpoint {
+            return EP.TransactionsEndpoint(components, options: [])
+        }
+    }
+
+    struct LedgersEndpoint: CollectionEndpoint {
         let components: [EP]
         let options: Set<Option>
 
@@ -120,26 +168,17 @@ enum EP {
             components = eps + (options.isEmpty ? [.ledgers(nil)] : [])
             self.options = options
         }
+    }
 
-        init(ledger: Int?) {
-            components = [.ledgers(ledger)]
-            options = Set()
-        }
+    struct OperationEndpoint: SimpleEndpoint {
+        let components: [EP]
 
-        func operations() -> OperationsEndpoint {
-            return EP.OperationsEndpoint(components, options: options)
-        }
-
-        func payments() -> PaymentsEndpoint {
-            return EP.PaymentsEndpoint(components, options: options)
-        }
-
-        func transactions() -> TransactionsEndpoint {
-            return EP.TransactionsEndpoint(components, options: options)
+        init(operation: Int) {
+            components = [.operations(operation)]
         }
     }
 
-    struct OperationsEndpoint: EndpointProtocol {
+    struct OperationsEndpoint: CollectionEndpoint {
         let components: [EP]
         let options: Set<Option>
 
@@ -147,14 +186,9 @@ enum EP {
             components = eps + (options.isEmpty ? [.operations(nil)] : [])
             self.options = options
         }
-
-        init(operation: Int?) {
-            components = [.operations(operation)]
-            options = Set()
-        }
     }
 
-    struct PaymentsEndpoint: EndpointProtocol {
+    struct PaymentsEndpoint: CollectionEndpoint {
         let components: [EP]
         let options: Set<Option>
 
@@ -164,7 +198,23 @@ enum EP {
         }
     }
 
-    struct TransactionsEndpoint: EndpointProtocol {
+    struct TransactionEndpoint: SimpleEndpoint {
+        let components: [EP]
+
+        init(transaction: String) {
+            components = [.transactions(transaction)]
+        }
+
+        func operations() -> OperationsEndpoint {
+            return EP.OperationsEndpoint(components, options: [])
+        }
+
+        func payments() -> PaymentsEndpoint {
+            return EP.PaymentsEndpoint(components, options: [])
+        }
+    }
+
+    struct TransactionsEndpoint: CollectionEndpoint {
         let components: [EP]
         let options: Set<Option>
 
@@ -172,40 +222,39 @@ enum EP {
             components = eps + (options.isEmpty ? [.transactions(nil)] : [])
             self.options = options
         }
-
-        init(transaction: String?) {
-            components = [.transactions(transaction)]
-            options = Set()
-        }
-
-        func operations() -> OperationsEndpoint {
-            return EP.OperationsEndpoint(components, options: options)
-        }
-
-        func payments() -> PaymentsEndpoint {
-            return EP.PaymentsEndpoint(components, options: options)
-        }
     }
 }
 
 enum Endpoint {
-    static func accounts(_ account: String?) -> EP.AccountsEndpoint {
-        return EP.AccountsEndpoint(account: account)
+    static func account(_ account: String?) -> EP.AccountEndpoint {
+        return EP.AccountEndpoint(account: account)
     }
 
-    static func ledgers(_ ledger: Int? = nil) -> EP.LedgersEndpoint {
-        return EP.LedgersEndpoint(ledger: ledger)
+    static func ledger(_ ledger: Int) -> EP.LedgerEndpoint {
+        return EP.LedgerEndpoint(ledger: ledger)
     }
 
-    static func operations(_ operation: Int? = nil) -> EP.OperationsEndpoint {
-        return EP.OperationsEndpoint(operation: operation)
+    static func ledgers() -> EP.LedgersEndpoint {
+        return EP.LedgersEndpoint([], options: [])
+    }
+
+    static func operation(_ operation: Int) -> EP.OperationEndpoint {
+        return EP.OperationEndpoint(operation: operation)
+    }
+
+    static func operations() -> EP.OperationsEndpoint {
+        return EP.OperationsEndpoint([], options: [])
     }
 
     static func payments() -> EP.PaymentsEndpoint {
-        return EP.PaymentsEndpoint([], options: Set())
+        return EP.PaymentsEndpoint([], options: [])
     }
 
-    static func transactions(_ transaction: String? = nil) -> EP.TransactionsEndpoint {
-        return EP.TransactionsEndpoint(transaction: transaction)
+    static func transaction(_ transaction: String) -> EP.TransactionEndpoint {
+        return EP.TransactionEndpoint(transaction: transaction)
+    }
+
+    static func transactions() -> EP.TransactionsEndpoint {
+        return EP.TransactionsEndpoint([], options: [])
     }
 }

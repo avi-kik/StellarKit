@@ -49,6 +49,9 @@
                   Identifier = "StellarBaseTests/test_network_parameters()">
                </Test>
                <Test
+                  Identifier = "StellarBaseTests/test_no_balance()">
+               </Test>
+               <Test
                   Identifier = "StellarBaseTests/test_payment_from_empty_account()">
                </Test>
                <Test

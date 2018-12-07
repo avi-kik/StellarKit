@@ -15,8 +15,9 @@ extension Operation {
         let destPK = PublicKey.PUBLIC_KEY_TYPE_ED25519(WD32(KeyUtils.key(base32: destination)))
 
         var sourcePK: PublicKey? = nil
-        if let source = source, let pk = source.publicKey {
-            sourcePK = PublicKey.PUBLIC_KEY_TYPE_ED25519(WD32(KeyUtils.key(base32: pk)))
+        if let source = source {
+            sourcePK =
+                PublicKey.PUBLIC_KEY_TYPE_ED25519(WD32(KeyUtils.key(base32: source.publicKey)))
         }
 
         return Operation(sourceAccount: sourcePK,
@@ -31,8 +32,9 @@ extension Operation {
         let destPK = PublicKey.PUBLIC_KEY_TYPE_ED25519(WD32(KeyUtils.key(base32: destination)))
 
         var sourcePK: PublicKey? = nil
-        if let source = source, let pk = source.publicKey {
-            sourcePK = PublicKey.PUBLIC_KEY_TYPE_ED25519(WD32(KeyUtils.key(base32: pk)))
+        if let source = source {
+            sourcePK =
+                PublicKey.PUBLIC_KEY_TYPE_ED25519(WD32(KeyUtils.key(base32: source.publicKey)))
         }
 
         return Operation(sourceAccount: sourcePK,
@@ -44,8 +46,9 @@ extension Operation {
 
     public static func changeTrust(asset: Asset, source: Account? = nil) -> Operation {
         var sourcePK: PublicKey? = nil
-        if let source = source, let pk = source.publicKey {
-            sourcePK = PublicKey.PUBLIC_KEY_TYPE_ED25519(WD32(KeyUtils.key(base32: pk)))
+        if let source = source {
+            sourcePK =
+                PublicKey.PUBLIC_KEY_TYPE_ED25519(WD32(KeyUtils.key(base32: source.publicKey)))
         }
 
         return Operation(sourceAccount: sourcePK,
@@ -54,8 +57,9 @@ extension Operation {
 
     public static func manageData(key: String, value: Data?, source: Account? = nil) -> Operation {
         var sourcePK: PublicKey? = nil
-        if let source = source, let pk = source.publicKey {
-            sourcePK = PublicKey.PUBLIC_KEY_TYPE_ED25519(WD32(KeyUtils.key(base32: pk)))
+        if let source = source {
+            sourcePK =
+                PublicKey.PUBLIC_KEY_TYPE_ED25519(WD32(KeyUtils.key(base32: source.publicKey)))
         }
 
         return Operation(sourceAccount: sourcePK,

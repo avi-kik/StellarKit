@@ -18,8 +18,7 @@ public protocol XDRDecodable {
     init(from decoder: XDRDecoder) throws
 }
 
-public protocol XDREncodableStruct: XDREncodable {
-}
+public protocol XDREncodableStruct: XDREncodable { }
 
 extension XDREncodableStruct {
     public func encode(to encoder: XDREncoder) throws {
@@ -45,26 +44,16 @@ public class XDREncoder {
     public static func encode<T>(_ value: T?) throws -> Data where T: XDREncodable {
         let encoder = XDREncoder()
 
-        try encoder.encodeOptional(value)
+        try encoder.encode(value)
 
         return encoder.data
     }
 
     func encode<T>(_ value: T) throws where T: XDREncodable {
-        switch value {
-        case let v as Bool: try v.encode(to: self)
-        case let v as UInt8: try v.encode(to: self)
-        case let v as Int32: try v.encode(to: self)
-        case let v as UInt32: try v.encode(to: self)
-        case let v as Int64: try v.encode(to: self)
-        case let v as UInt64: try v.encode(to: self)
-        case let v as String: try v.encode(to: self)
-        case let v as Data: try v.encode(to: self)
-        default: try value.encode(to: self)
-        }
+        try value.encode(to: self)
     }
 
-    func encodeOptional<T>(_ value: T?) throws where T: XDREncodable {
+    func encode<T>(_ value: T?) throws where T: XDREncodable {
         if let v = value {
             try self.encode(Int32(1))
             try v.encode(to: self)
@@ -72,10 +61,6 @@ public class XDREncoder {
         else {
             try self.encode(Int32(0))
         }
-    }
-
-    fileprivate func append(_ data: Data) {
-        self.data.append(data)
     }
 
     fileprivate func append<S>(_ data: S) where S: Sequence, S.Element == Data.Iterator.Element {
@@ -89,24 +74,29 @@ public class XDRDecoder {
         case stringDecodingFailed(Data)
     }
 
-    private var data: Data
+    private let data: Data
     private var cursor: Int = 0
 
-    public static func decode<T>(_ type: T.Type, data: Data) throws -> T where T: XDRDecodable {
+    public static func decode<T: XDRDecodable>(_ type: T.Type, data: Data) throws -> T {
         let decoder = XDRDecoder(data: data)
         return try decoder.decode(type)
+    }
+
+    public static func decode<T: XDRDecodable>(_ type: T?.Type, data: Data) throws -> T? {
+        let decoder = XDRDecoder(data: data)
+        return try decoder.decode([T].self).first
     }
 
     public func decode<T: XDRDecodable>(_ type: T.Type) throws -> T {
         return try type.init(from: self)
     }
 
-    public func decodeArray<T: XDRDecodable>(_ type: T.Type) throws -> [T] {
-        var a = [T]()
+    public func decode<T: XDRDecodable>(_ type: T?.Type) throws -> T? {
+        return try decode([T].self).first
+    }
 
-        let count = try decode(Int32.self)
-        try (0 ..< count).forEach { _ in try a.append(type.init(from: self)) }
-        return a
+    public func decode<T: XDRDecodable>(_ type: [T].Type) throws -> [T] {
+        return try (0 ..< decode(Int32.self)).map { _ in try T.self.init(from: self) }
     }
 
     public init(data: Data) {
@@ -114,24 +104,26 @@ public class XDRDecoder {
     }
 
     fileprivate func read(_ byteCount: Int, into: UnsafeMutableRawPointer) throws {
-        if cursor + byteCount > data.count {
-            throw Errors.prematureEndOfData
-        }
+        guard cursor + byteCount <= data.count else { throw Errors.prematureEndOfData }
 
         data.withUnsafeBytes({ (ptr: UnsafePointer<UInt8>) -> () in
             let from = ptr + cursor
             memcpy(into, from, byteCount)
         })
 
-        cursor += byteCount
+        advance(by: byteCount)
     }
 
     fileprivate func read(_ count: Int) throws -> [UInt8] {
-        let bytes = data[cursor..<cursor + count]
-        cursor += count
+        guard cursor + count <= data.count else { throw Errors.prematureEndOfData }
+
+        let bytes = data[cursor ..< cursor + count]
+        advance(by: count)
 
         return bytes.map { $0 }
     }
+
+    fileprivate func advance(by count: Int) { cursor += count }
 }
 
 extension Bool: XDRCodable {
@@ -185,9 +177,10 @@ extension String: XDRCodable {
 extension Data: XDRCodable {
     public init(from decoder: XDRDecoder) throws {
         let length = try Int32(from: decoder)
+
         self = try Data(bytes: decoder.read(Int(length)))
 
-        try (0 ..< (4 - Int(count) % 4) % 4).forEach { _ in _ = try decoder.decode(UInt8.self) }
+        decoder.advance(by: (4 - Int(count) % 4) % 4)
     }
 
     public func encode(to encoder: XDREncoder) throws {
@@ -197,13 +190,9 @@ extension Data: XDRCodable {
     }
 }
 
-extension Array: XDREncodable {
+extension Array: XDREncodable where Element: XDREncodable {
     public func encode(to encoder: XDREncoder) throws {
         try encoder.encode(Int32(count))
-        try forEach {
-            if let e = $0 as? XDREncodable {
-                try e.encode(to: encoder)
-            }
-        }
+        try forEach { try $0.encode(to: encoder) }
     }
 }

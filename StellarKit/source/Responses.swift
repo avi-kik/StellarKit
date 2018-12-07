@@ -197,6 +197,23 @@ extension Responses.RequestFailure {
 
         return nil
     }
+
+    public var isMissingAccount: Bool {
+        return status == 404
+    }
+    
+    public var isExistingAccount: Bool {
+        if
+            let results = transactionResult?.operationResults,
+            let inner = results[0].tr,
+            case let .CREATE_ACCOUNT(result) = inner,
+            result == .alreadyExists
+        {
+            return true
+        }
+
+        return false
+    }
 }
 
 extension Responses.TransactionSuccess {

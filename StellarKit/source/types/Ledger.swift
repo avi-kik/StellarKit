@@ -29,11 +29,11 @@ public struct AccountEntry: XDRDecodable {
         balance = try decoder.decode(Int64.self)
         seqNum = try decoder.decode(SequenceNumber.self)
         numSubEntries = try decoder.decode(UInt32.self)
-        inflationDest = try decoder.decodeArray(AccountID.self).first
+        inflationDest = try decoder.decode(AccountID?.self)
         flags = try decoder.decode(UInt32.self)
         homeDomain = try decoder.decode(String.self)
         thresholds = try decoder.decode(WrappedData4.self)
-        signers = try decoder.decodeArray(Signer.self)
+        signers = try decoder.decode([Signer].self)
         _ = try decoder.decode(Int32.self)
     }
 }
@@ -47,7 +47,7 @@ public struct TrustLineEntry: XDRDecodable {
     let reserved: Int32 = 0
 
     public var account: String {
-        return accountID.publicKey!
+        return accountID.publicKey
     }
 
     public init(from decoder: XDRDecoder) throws {
@@ -174,7 +174,7 @@ public struct OperationMeta: XDRDecodable {
     public let changes: [LedgerEntryChange]
 
     public init(from decoder: XDRDecoder) throws {
-        changes = try decoder.decodeArray(LedgerEntryChange.self)
+        changes = try decoder.decode([LedgerEntryChange].self)
     }
 }
 
@@ -186,7 +186,7 @@ public enum TransactionMeta: XDRDecodable {
 
         switch discriminant {
         case 0:
-            self = .operations(try decoder.decodeArray(OperationMeta.self))
+            self = .operations(try decoder.decode([OperationMeta].self))
         default:
             fatalError("Unsupported case: \(discriminant)")
         }

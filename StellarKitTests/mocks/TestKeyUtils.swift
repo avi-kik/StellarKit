@@ -84,7 +84,8 @@ public struct TestKeyUtils {
 
     public static func sign(message: Data, signingKey: [UInt8]) throws -> [UInt8] {
         guard let signature = Sodium().sign.signature(message: message.array,
-                                                      secretKey: signingKey) else {
+                                                      secretKey: signingKey) else
+        {
             throw StellarError.signingFailed
         }
 

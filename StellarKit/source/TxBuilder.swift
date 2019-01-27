@@ -137,18 +137,11 @@ public final class TxBuilder {
             var env = env
 
             for signer in signers {
-                try env.add(signature: env.tx.sign(using: signer, for: self.node))
+                try env.add(signature: env.tx.signature(using: signer, for: self.node))
             }
 
             return env
         }
-    }
-
-    public func post() -> Promise<Responses.TransactionSuccess> {
-        return sign()
-            .then ({
-                return self.node.post(envelope: $0)
-            })
     }
 
     private func calculatedFee() -> Promise<UInt32> {

@@ -36,7 +36,7 @@ private func url(for components: [EP], and options: Set<Option>, with base: URL)
             params += (params.count == 1 ? "" : "&") + "limit=\(limit)"
         case .cursor(let cursor):
             params += (params.count == 1 ? "" : "&") + "cursor=\(cursor)"
-        case .null:
+        case .none:
             break
         }
     }
@@ -50,7 +50,7 @@ enum Option: Hashable {
     case order(Order)
     case limit(Int)
     case cursor(String)
-    case null
+    case none
 }
 
 protocol CollectionQueryable {
@@ -75,7 +75,7 @@ extension SimpleEndpoint {
     }
 }
 
-protocol CollectionEndpoint: SimpleEndpoint, CollectionQueryable {
+protocol CollectionEndpoint: EndpointProtocol, CollectionQueryable {
     init(_ eps: [EP], options: Set<Option>)
 }
 
@@ -96,7 +96,7 @@ extension CollectionEndpoint {
 
     func cursor(_ cursor: String?) -> Self {
         return Self.init(components,
-                         options: options.union([cursor != nil ? Option.cursor(cursor!) : .null]))
+                         options: options.union([cursor != nil ? Option.cursor(cursor!) : .none]))
     }
 }
 
@@ -123,7 +123,7 @@ enum EP {
     case payments
     case transactions(String?)
 
-    struct AccountEndpoint: SimpleEndpoint, ContainsTxComponents {
+    struct AccountEndpoint: ContainsTxComponents {
         let components: [EP]
 
         init(account: String) {
@@ -131,7 +131,7 @@ enum EP {
         }
     }
 
-    struct LedgerEndpoint: SimpleEndpoint, ContainsTxComponents {
+    struct LedgerEndpoint: ContainsTxComponents {
         let components: [EP]
 
         init(ledger: Int) {

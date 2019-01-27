@@ -9,23 +9,22 @@
 import Foundation
 import KinUtil
 
-public enum NetworkId {
-    private static let testId = "Test SDF Network ; September 2015"
-    private static let mainId = "Public Global Stellar Network ; September 2015"
+public struct NetworkId {
+    private static let stellarTestId = "Test SDF Network ; September 2015"
+    private static let stellarMainId = "Public Global Stellar Network ; September 2015"
 
-    case main
-    case test
-    case custom(String)
+    public let identifier: String
+
+    init(_ identifier: String) { self.identifier = identifier }
+}
+
+extension NetworkId {
+    public static var stellarMain: NetworkId { return NetworkId(stellarMainId) }
+    public static var stellarTest: NetworkId { return NetworkId(stellarTestId) }
 }
 
 extension NetworkId: CustomStringConvertible {
-    public var description: String {
-        switch self {
-        case .main: return NetworkId.mainId
-        case .test: return NetworkId.testId
-        case .custom(let identifier): return identifier
-        }
-    }
+    public var description: String { return identifier }
 }
 
 public struct NetworkConfiguration {
@@ -33,7 +32,7 @@ public struct NetworkConfiguration {
     let baseReserve: UInt32
     let maxTxSetSize: Int
 
-    init(_ ledgers: Responses.Ledgers) {
+    fileprivate init(_ ledgers: Responses.Ledgers) {
         baseFee = ledgers.ledgers[0].baseFee
         baseReserve = ledgers.ledgers[0].baseReserve
         maxTxSetSize = ledgers.ledgers[0].max_tx_set_size
@@ -43,14 +42,13 @@ public struct NetworkConfiguration {
 public struct Node {
     public let baseURL: URL
     public let networkId: NetworkId
-
-    public init(baseURL: URL, networkId: NetworkId = .test) {
-        self.baseURL = baseURL
-        self.networkId = networkId
-    }
 }
 
 extension Node {
+    public func txBuilder(account: Account) -> TxBuilder {
+        return TxBuilder(source: account, node: self)
+    }
+
     public func networkConfiguration() -> Promise<NetworkConfiguration> {
         return Endpoint.ledgers().order(.desc).limit(1).get(from: baseURL)
             .then({ (response: Responses.Ledgers) -> Promise<NetworkConfiguration> in
@@ -129,7 +127,7 @@ public protocol Account {
 }
 
 extension Account {
-    public func accountDetails(node: Node) -> Promise<Responses.AccountDetails> {
+    public func details(node: Node) -> Promise<Responses.AccountDetails> {
         return Endpoint.account(publicKey).get(from: node.baseURL)
     }
 
@@ -138,12 +136,12 @@ extension Account {
             return Promise().signal(seqNum)
         }
 
-        return accountDetails(node: node)
+        return details(node: node)
             .then { return Promise<UInt64>().signal($0.seqNum + 1) }
     }
 
     public func balance(asset: Asset = .ASSET_TYPE_NATIVE, node: Node) -> Promise<Decimal> {
-        return accountDetails(node: node)
+        return details(node: node)
             .then({ accountDetails -> Decimal in
                 for balance in accountDetails.balances where balance.asset == asset {
                     return balance.balanceNum
@@ -151,6 +149,10 @@ extension Account {
 
                 throw StellarError.missingBalance
             })
+    }
+
+    public func txBuilder(node: Node) -> TxBuilder {
+        return TxBuilder(source: self, node: node)
     }
 
     /**
@@ -191,11 +193,25 @@ extension Account {
 }
 
 extension Transaction {
-    public func sign(using account: Account, for node: Node) throws -> DecoratedSignature {
-        let sig = try account.sign(self.hash(networkId: String(describing: node.networkId)))
+    public func signature(using account: Account, for node: Node) throws -> DecoratedSignature {
+        let sig = try account.sign(self.hash(networkId: node.networkId.identifier))
 
         let hint = WrappedData4(KeyUtils.key(base32: account.publicKey).suffix(4))
 
         return DecoratedSignature(hint: hint, signature: sig)
+    }
+}
+
+extension TransactionEnvelope {
+    public func post(to node: Node) -> Promise<Responses.TransactionSuccess> {
+        return node.post(envelope: self)
+    }
+}
+
+extension Promise where Value == TransactionEnvelope {
+    public func post(to node: Node) -> Promise<Responses.TransactionSuccess> {
+        return self.then({
+            return node.post(envelope: $0)
+        })
     }
 }

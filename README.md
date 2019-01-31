@@ -2,107 +2,43 @@
 
 A framework for interacting with the [Stellar](https://www.stellar.org) blockchain network.  StellarKit communicates with Horizon nodes.
 
-## <a name="concepts"></a>Concepts
+## The Fork
 
-#### Accounts
+This is a fork of the official, now defunct, repo from [Kin Ecosystem](https://github.com/kinecosystem/StellarKit).  This fork aims to be compatible with official Stellar networks, while also supporting the Kin Blockchain.
 
-Stellar represents an account as an `ED25519` key-pair.  The public key represents the account on the network, and the secret key is used only for signing transactions.
+## Availability
 
-The textual representation of a public key uses the following format:
+Besides being usable as an Xcode subproject, there is full SPM support.  The CocoaPod will not be maintained.
 
-`G<base32 representation of key + 2 byte CRC>`
+The framework builds on iOS and macOS, and has been known to build on Linux.
 
-**Example:** `GCDXVSRN7TORSWS6N3FEHV3KUKGK4F74ZJDRENEAKVDWXIEFR5BOKMGK`
+## Compatibility
 
-#### Assets
+Source and API compatibility between commits is an anti-goal.  The framework is in a constant state of revision and improvement.  If stability is desired, it is recommended that a fork is created and maintained.
 
-An asset represents a transferable unit.  Stellar uses a native unit, called a Lumen, which is used for paying transaction fees and account maintenance.  The network also supports non-native, or user-defined, assets, which are identified via a code and an issuer.
+This framework will be migrated to official Swift releases, as included with Xcode updates and upgrades.
 
-An asset issuer is an account which has been trusted to issue an asset.
+## The Cast
 
-#### Trust
+- Node
+- Account
+- TxBuilder
 
-In order to receive a non-native asset, an account must trust the issuer.  This allows multiple assets with the same code to coexist.
+### Node
+An instance of `Node` represents a single Horizon-compatible endpoint.  It can be used to query non-account-specific information from the network.
 
-## Design
+### Account
+`Account` is a protocol.  Conforming types represent a public address on the network, and provides a facility for signing transactions.  The API includes methods for querying account-specific information.
 
-StellarKit exposes `Stellar`, which is a stateless struct with static methods.  In addition to method-specific parameters, each method takes a parameter called `node`, of type `Stellar.Node`.
+### TxBuilder
+An instance of `TxBuilder` allows construction of a single transaction.  All aspects of a transaction are configurable with the available API.
 
-##### Stellar.Node
+## Some notes about XDR
 
-```Swift
-struct Node {
-    let baseURL: URL
-    let networkId: NetworkId
-}
-```
+Stellar uses [XDR](https://tools.ietf.org/html/rfc4506), a binary format for data interchange.  StellarKit includes an almost complete [XDR coder and decoder](https://github.com/avi-kik/StellarKit/blob/master/StellarKit/source/XDRCodable.swift), loosely modeled on the native `Codable` protocols.  Data types not used by `Stellar` are not included (primarily floating point types).
 
-* `baseURL` is the URL of the Horizon node.  It is used to construct URLs for Horizon API end-points.
-* `networkId` identifies the Stellar network to which the Horizon node belongs.
+StellarKit defines `struct`s and `enum`s for many of Stellar's xdr definitions (contributions welcome!).  Unfortunately, `enum`s are not always ergonomic in Swift, and thus StellarKit adds convenience methods for many such definitions to ease the pain.
 
-##### NetworkId
+## Future Direction
 
-```Swift
-enum NetworkId {
-    case test
-    case main
-    case custom(String)
-}
-```
-
-Stellar identifies a network via a pre-defined string.  The Stellar Development Foundation runs two public networks.  One is the live network, and the other is for testing.  Developers may establish private networks, using their own identifiers.
-
-* `test` represents the Stellar Foundation's test net.
-* `main` represents the Stellar Foundation's public (live) net.
-* `custom` allows a user-defined identifier to be provided, to be used with private networks.
-
-##### Account
-
-```Swift
-public protocol Account {
-    var publicKey: String? { get }
-
-    var sign: ((Data) throws -> Data)? { get }
-}
-```
-
-`StellarKit` does not contain an implementation of the account concept.  Instead, it relies on the `Account` protocol to provide the required functionality.
-
-* `publicKey` is the string representation of the account's public key, as described in the <a href="#concepts">Concepts</a> section.
-* `sign` is a closure which accepts a Data object to be signed, and returns the signature.
-
-This design allows `StellarKit` to remain agnostic with respect to encryption implementations and account storage mechanisms.  It also avoids 3rd-party dependencies, as iOS (and macos) have no native implementations of ED25519 algorithms.
-
-##### Promises
-
-Most `Stellar` methods return a `Promise`, which is an abstraction over asynchronous processes which allows for chaining actions.  `StellarKit` uses a minimal implementation provided by [KinUtil](https://github.com/kinfoundation/kin-util-ios), to avoid 3rd-party dependencies.
-
-## Functionality
-
-At this time, `StellarKit` supports the following operations:
-
-* making payments
-* retrieving balances
-* trusting non-native assets
-* retrieving account details
-* observing changes
-
-Inline documentation describes how to use each method.
-
-## Getting Started
-
-The Stellar network is designed for the usage of non-native assets.  This section describes how to prepare an account to send and receive such assets.
-
-1. [Create the account](https://www.stellar.org/developers/horizon/reference/resources/operation.html#create-account) on the network.
-
-   This operation requires a funding account which has sufficient Lumens to provide the necessary reserve.  It is customary to provide extra to allow the account to pay transaction fees.  This operation is typically performed by a service, and is outside the scope of this framework.
-
-2. [Trust the asset](https://www.stellar.org/developers/horizon/reference/resources/operation.html#change-trust).
-
-   This operation is performed by `Stellar.trust(...)`.
-
-   ```Swift
-   public static func trust(asset: Asset,
-                            account: Account,
-                            configuration: Configuration) -> Promise<String>
-   ```
+This framework was born out of a need for an iOS SDK for Stellar.  While Kin Ecosystem has moved in a different direction, this framework hopes to maintain compatibility with official Stellar networks.  That said, it is maintained as part of my responsibilities as a Kin Blockchain developer, and is thus missing much functionality provided by Horizon and stellar-core.  Pull requests to add support for missing operations and responses will be welcomed.

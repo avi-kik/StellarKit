@@ -16,7 +16,7 @@ public final class TxBuilder {
     private let node: Node
 
     private var fee: UInt32?
-    private var signers = [Account]()
+    private var signers: [Account]
 
     public init(source: Account, node: Node, tx: Transaction? = nil) {
         self.source = source
@@ -30,10 +30,6 @@ public final class TxBuilder {
                                 memo: .MEMO_NONE,
                                 fee: 0,
                                 operations: [])
-
-        if tx != nil {
-            _tx.sourceAccount = PublicKey(WD32(KeyUtils.key(base32: source.publicKey)))
-        }
     }
 
     @discardableResult
@@ -62,8 +58,8 @@ public final class TxBuilder {
     }
 
     @discardableResult
-    public func set(lowerBounds: Date) -> TxBuilder {
-        let lower = UInt64(lowerBounds.timeIntervalSince1970)
+    public func set(lowerBound: Date) -> TxBuilder {
+        let lower = UInt64(lowerBound.timeIntervalSince1970)
         let upper = _tx.timeBounds?.maxTime ?? 0
 
         _tx.timeBounds = TimeBounds(minTime: lower, maxTime: upper)
@@ -72,9 +68,9 @@ public final class TxBuilder {
     }
 
     @discardableResult
-    public func set(upperBounds: Date) -> TxBuilder {
+    public func set(upperBound: Date) -> TxBuilder {
         let lower = _tx.timeBounds?.minTime ?? 0
-        let upper = UInt64(upperBounds.timeIntervalSince1970)
+        let upper = UInt64(upperBound.timeIntervalSince1970)
 
         _tx.timeBounds = TimeBounds(minTime: lower, maxTime: upper)
 
@@ -128,11 +124,11 @@ public final class TxBuilder {
         }
     }
 
-    public func sign(with signer: Account? = nil) -> Promise<TransactionEnvelope> {
-        return sign(with: signer != nil ? [signer!] : signers)
+    public func signedEnvelope(with signer: Account? = nil) -> Promise<TransactionEnvelope> {
+        return signedEnvelope(with: signer != nil ? [signer!] : signers)
     }
 
-    public func sign(with signers: [Account]) -> Promise<TransactionEnvelope> {
+    public func signedEnvelope(with signers: [Account]) -> Promise<TransactionEnvelope> {
         return envelope().then { (env) -> TransactionEnvelope in
             var env = env
 

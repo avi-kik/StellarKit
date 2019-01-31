@@ -50,10 +50,23 @@ public struct Node {
 }
 
 extension Node {
+    /**
+     Obtain a `TxBuilder` configured with `self` as the node.
+
+     - parameter account: The source account for the built transaction.
+
+     - Returns: A preconfigured `TxBuilder`.
+     */
     public func txBuilder(account: Account) -> TxBuilder {
         return TxBuilder(source: account, node: self)
     }
 
+    /**
+     Obtain the network configuration.  Network configuration conists of parameters
+     obtained from the last ledger ingested by the node.
+
+     - Returns: A `NetworkConfiguration` object.
+     */
     public func networkConfiguration() -> Promise<NetworkConfiguration> {
         return Endpoint.ledgers().order(.desc).limit(1).get(from: baseURL)
             .then({ (response: Responses.Ledgers) -> Promise<NetworkConfiguration> in
@@ -89,6 +102,14 @@ extension Node {
         return EventWatcher(eventSource: StellarEventSource(url: url))
     }
 
+    /**
+     Submit a transaction to the node.
+
+     - parameter envelope: The transaction envelope to post.  Envelopes can be obtained
+     from a `TxBuilder` instance.
+
+     - Returns: A promise which will be signalled with the result of the POST operation.
+     */
     public func post(envelope: TransactionEnvelope) -> Promise<Responses.TransactionSuccess> {
         let envelopeData: Data
         do {
@@ -147,8 +168,8 @@ extension Account {
 
     public func balance(asset: Asset = .ASSET_TYPE_NATIVE, node: Node) -> Promise<Decimal> {
         return details(node: node)
-            .then({ accountDetails -> Decimal in
-                for balance in accountDetails.balances where balance.asset == asset {
+            .then({ details -> Decimal in
+                if let balance = details.balances.filter({ $0.asset == asset }).first {
                     return balance.balanceNum
                 }
 
@@ -156,6 +177,13 @@ extension Account {
             })
     }
 
+    /**
+     Obtain a `TxBuilder` configured with `self` as the source account.
+
+     - parameter node: The node to which the built transaction will be sent.
+
+     - Returns: A preconfigured `TxBuilder`.
+     */
     public func txBuilder(node: Node) -> TxBuilder {
         return TxBuilder(source: self, node: node)
     }

@@ -24,7 +24,7 @@ class HorizonRequest: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate {
     fileprivate var tasks = [URLSessionTask: RequestState]()
 
     override init() {
-        session = URLSession()
+        session = URLSession(configuration: URLSessionConfiguration.default)
 
         super.init()
 

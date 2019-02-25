@@ -11,7 +11,7 @@ let package = Package(
             targets: ["StellarKit"]),
     ],
     dependencies: [
-	.package(url: "kin-util-ios", from: "0.0.3")
+	.package(url: "https://github.com/kinecosystem/kin-util-ios.git", from: "0.0.3")
     ],
     targets: [
 	.target(

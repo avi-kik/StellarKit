@@ -182,8 +182,9 @@ public struct ManageDataOp: XDRCodable {
     public init(from decoder: XDRDecoder) throws {
         dataName = try decoder.decode(String.self)
 
-        let data = try decoder.decode([UInt8].self)
-        dataValue = data.isEmpty ? nil : Data(bytes: data)
+        dataValue = try decoder.decode(Bool.self)
+            ? try decoder.decode(Data.self)
+            : nil
     }
 
     public init(dataName: String, dataValue: Data?) {

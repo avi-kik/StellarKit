@@ -104,3 +104,39 @@ public struct TransactionSet: XDRDecodable {
 }
 
 extension TransactionSet: Encodable {}
+
+public struct TransactionHistoryResultEntry: XDRDecodable {
+    let ledgerSeq: UInt32
+    let txResultSet: TransactionResultSet
+    let reserved: Int32 = 0
+
+    public init(from decoder: XDRDecoder) throws {
+        ledgerSeq = try decoder.decode(UInt32.self)
+        txResultSet = try decoder.decode(TransactionResultSet.self)
+        _ = try decoder.decode(Int32.self)
+    }
+}
+
+extension TransactionHistoryResultEntry: Encodable {}
+
+struct TransactionResultSet: XDRDecodable {
+    let results: [TransactionResultPair]
+
+    public init(from decoder: XDRDecoder) throws {
+        results = try decoder.decode([TransactionResultPair].self)
+    }
+}
+
+extension TransactionResultSet: Encodable {}
+
+struct TransactionResultPair: XDRDecodable {
+    let transactionHash: Hash
+    let result: TransactionResult
+
+    public init(from decoder: XDRDecoder) throws {
+        transactionHash = try decoder.decode(Hash.self)
+        result = try decoder.decode(TransactionResult.self)
+    }
+}
+
+extension TransactionResultPair: Encodable {}

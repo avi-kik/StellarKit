@@ -38,6 +38,8 @@ public struct AccountEntry: XDRDecodable {
     }
 }
 
+extension AccountEntry: Encodable {}
+
 public struct TrustLineEntry: XDRDecodable {
     let accountID: AccountID
     public let asset: Asset
@@ -96,6 +98,8 @@ public struct DataEntry: XDRDecodable {
     }
 }
 
+extension DataEntry: Encodable {}
+
 public struct LedgerEntryType {
     static let ACCOUNT: Int32 = 0
     static let TRUSTLINE: Int32 = 1
@@ -139,6 +143,21 @@ public struct LedgerEntry: XDRDecodable {
     }
 }
 
+extension LedgerEntry: Encodable {}
+
+extension LedgerEntry.Data: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+
+        switch self {
+        case .ACCOUNT(let entry): try container.encode(entry)
+        case .TRUSTLINE: break
+        case .OFFER: break
+        case .DATA(let entry): try container.encode(entry)
+        }
+    }
+}
+
 struct LedgerEntryChangeType {
     static let LEDGER_ENTRY_CREATED: Int32 = 0 // entry was added to the ledger
     static let LEDGER_ENTRY_UPDATED: Int32 = 1 // entry was modified in the ledger
@@ -166,6 +185,60 @@ public enum LedgerEntryChange: XDRDecodable {
             self = .LEDGER_ENTRY_STATE(try decoder.decode(LedgerEntry.self))
         default:
             fatalError("Unrecognized change type: \(discriminant)")
+        }
+    }
+}
+
+public enum LedgerKey: XDRDecodable {
+    public struct _Account: XDRDecodable, Encodable {
+        let accountID: AccountID
+
+        public init(from decoder: XDRDecoder) throws {
+            accountID = try decoder.decode(AccountID.self)
+        }
+    }
+
+    public struct _Data: XDRDecodable, Encodable {
+        let accountID: AccountID
+        let dataName: String
+
+        public init(from decoder: XDRDecoder) throws {
+            accountID = try decoder.decode(AccountID.self)
+            dataName = try decoder.decode(String.self)
+        }
+    }
+
+    case ACCOUNT(_Account)
+    case TRUSTLINE
+    case OFFER
+    case DATA(_Data)
+
+    public init(from decoder: XDRDecoder) throws {
+        let discriminant = try decoder.decode(Int32.self)
+        
+        switch discriminant {
+        case LedgerEntryType.ACCOUNT:
+            self = .ACCOUNT(try decoder.decode(_Account.self))
+        case LedgerEntryType.TRUSTLINE:
+            fatalError("Unsupported key type: \(discriminant)")
+        case LedgerEntryType.OFFER:
+            fatalError("Unsupported key type: \(discriminant)")
+        case LedgerEntryType.DATA:
+            self = .DATA(try decoder.decode(_Data.self))
+        default: fatalError("Unsupported key type: \(discriminant)")
+        }
+    }
+}
+
+extension LedgerKey: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+
+        switch self {
+        case .ACCOUNT(let account): try container.encode(account)
+        case .TRUSTLINE: break
+        case .OFFER: break
+        case .DATA(let data): try container.encode(data)
         }
     }
 }

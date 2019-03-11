@@ -140,3 +140,34 @@ struct TransactionResultPair: XDRDecodable {
 }
 
 extension TransactionResultPair: Encodable {}
+
+public enum BucketEntry: XDRDecodable {
+    case LIVEENTRY(LedgerEntry)
+    case DEADENTRY(LedgerKey)
+
+    public init(from decoder: XDRDecoder) throws {
+        let discriminant = try decoder.decode(UInt32.self)
+        
+        switch discriminant {
+        case 0: self = .LIVEENTRY(try decoder.decode(LedgerEntry.self))
+        case 1: self = .DEADENTRY(try decoder.decode(LedgerKey.self))
+        default: fatalError("Unexpected type: \(discriminant)")
+        }
+
+    }
+}
+
+extension BucketEntry: Encodable {
+    enum CodingKeys: String, CodingKey {
+        case LIVEENTRY, DEADENTRY
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .LIVEENTRY(let entry): try container.encode(entry, forKey: .LIVEENTRY)
+        case .DEADENTRY(let key): try container.encode(key, forKey: .DEADENTRY)
+        }
+    }
+}

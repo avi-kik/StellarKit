@@ -169,3 +169,21 @@ public enum Asset: XDRCodable, Equatable {
         return lhs.isEqual(asset: rhs)
     }
 }
+
+extension Asset: Encodable {
+    enum CodingKeys: String, CodingKey {
+        case code, issuer
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        switch self {
+        case .ASSET_TYPE_NATIVE:
+            var container = encoder.singleValueContainer()
+            try container.encode(assetCode)
+        default:
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(assetCode, forKey: .code)
+            try container.encode(issuer, forKey: .issuer)
+        }
+    }
+}

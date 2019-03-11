@@ -99,6 +99,20 @@ public enum Memo: XDRCodable {
     }
 }
 
+extension Memo: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+
+        switch self {
+        case .MEMO_NONE: try container.encode("")
+        case .MEMO_TEXT(let string): try container.encode(string)
+        case .MEMO_HASH(let data): try container.encode(data.hexString)
+        case .MEMO_RETURN(let data): try container.encode(data.hexString)
+        case .MEMO_ID(let id): try container.encode(id)
+        }
+    }
+}
+
 public struct TimeBounds: XDRCodable, XDREncodableStruct {
     let minTime: UInt64
     let maxTime: UInt64
@@ -113,6 +127,8 @@ public struct TimeBounds: XDRCodable, XDREncodableStruct {
         maxTime = try decoder.decode(UInt64.self)
     }
 }
+
+extension TimeBounds: Encodable {}
 
 public struct Transaction: XDRCodable {
     var sourceAccount: PublicKey
@@ -185,6 +201,8 @@ public struct Transaction: XDRCodable {
     }
 }
 
+extension Transaction: Encodable {}
+
 struct EnvelopeType {
     static let ENVELOPE_TYPE_SCP: Int32 = 1
     static let ENVELOPE_TYPE_TX: Int32 = 2
@@ -246,6 +264,19 @@ public struct DecoratedSignature: XDRCodable, XDREncodableStruct, Equatable {
     }
 }
 
+extension DecoratedSignature: Encodable {
+    enum CodingKeys: String, CodingKey {
+        case hint
+        case signature
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(hint.wrapped.hexString, forKey: .hint)
+        try container.encode(Data(signature).base64EncodedString(), forKey: .signature)
+    }
+}
+
 public struct TransactionEnvelope: XDRCodable, XDREncodableStruct {
     let tx: Transaction
     private(set) var signatures: [DecoratedSignature]
@@ -260,6 +291,8 @@ public struct TransactionEnvelope: XDRCodable, XDREncodableStruct {
         self.signatures = signatures
     }
 }
+
+extension TransactionEnvelope: Encodable {}
 
 extension TransactionEnvelope {
     public mutating func add(signature: DecoratedSignature) {

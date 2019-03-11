@@ -62,6 +62,13 @@ enum PublicKey: XDRCodable, Equatable {
     }
 }
 
+extension PublicKey: Encodable {
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(publicKey)
+    }
+}
+
 struct SignerKeyType {
     static let SIGNER_KEY_TYPE_ED25519 = CryptoKeyType.KEY_TYPE_ED25519
     static let SIGNER_KEY_TYPE_PRE_AUTH_TX = CryptoKeyType.KEY_TYPE_PRE_AUTH_TX
@@ -103,6 +110,19 @@ enum SignerKey: XDRCodable {
         case .SIGNER_KEY_TYPE_ED25519 (let key): try encoder.encode(key)
         case .SIGNER_KEY_TYPE_PRE_AUTH_TX (let key): try encoder.encode(key)
         case .SIGNER_KEY_TYPE_HASH_X (let key): try encoder.encode(key)
+        }
+    }
+}
+
+extension SignerKey: Encodable {
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .SIGNER_KEY_TYPE_ED25519(let data):
+            try container.encode(KeyUtils.base32(publicKey: data.wrapped.array))
+        case .SIGNER_KEY_TYPE_HASH_X(let data),
+             .SIGNER_KEY_TYPE_PRE_AUTH_TX(let data):
+            try container.encode(data.wrapped.hexString)
         }
     }
 }

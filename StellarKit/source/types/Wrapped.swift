@@ -1,5 +1,5 @@
 //
-//  WrappedData.swift
+//  Wrapped.swift
 //  StellarKit
 //
 //  Created by Kin Foundation.
@@ -23,7 +23,7 @@ private func decodeData(from decoder: XDRDecoder, capacity: Int) throws -> Data 
     return d
 }
 
-protocol WrappedData: XDRCodable, Equatable {
+protocol WrappedData: XDRCodable, Equatable, Encodable {
     static var capacity: Int { get }
 
     var wrapped: Data { get set }
@@ -65,6 +65,13 @@ extension WrappedData {
     }
 }
 
+extension WrappedData {
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(wrapped.hexString)
+    }
+}
+
 struct WrappedData4: WrappedData {
     static let capacity: Int = 4
 
@@ -92,5 +99,33 @@ struct WrappedData32: WrappedData {
 
     init() {
         wrapped = Data()
+    }
+}
+
+protocol WrappedArray: XDRDecodable {
+    associatedtype T: XDRDecodable
+
+    var capacity: Int { get }
+
+    var wrapped: [T] { get set }
+
+    init()
+}
+
+extension WrappedArray {
+    init(from decoder: XDRDecoder) throws {
+        self.init()
+
+        for _ in 0 ..< capacity { wrapped.append(try decoder.decode(T.self)) }
+    }
+}
+
+struct WrappedArray4<T: XDRDecodable>: WrappedArray {
+    let capacity: Int = 4
+
+    var wrapped: [T]
+
+    init() {
+        wrapped = []
     }
 }

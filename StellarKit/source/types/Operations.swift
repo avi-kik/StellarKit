@@ -34,6 +34,8 @@ public struct CreateAccountOp: XDRCodable, XDREncodableStruct {
     }
 }
 
+extension CreateAccountOp: Encodable {}
+
 struct PaymentOp: XDRCodable, XDREncodableStruct {
     let destination: PublicKey
     let asset: Asset
@@ -51,6 +53,8 @@ struct PaymentOp: XDRCodable, XDREncodableStruct {
         self.amount = amount
     }
 }
+
+extension PaymentOp: Encodable {}
 
 public struct PathPaymentOp: XDRCodable, XDREncodableStruct {
     let sendAsset: Asset
@@ -132,6 +136,8 @@ public struct SetOptionsOp: XDRCodable, XDREncodableStruct {
     }
 }
 
+extension SetOptionsOp: Encodable {}
+
 public struct ManageOfferOp: XDRCodable, XDREncodableStruct {
     let buying: Asset
     let selling: Asset
@@ -193,6 +199,8 @@ public struct ManageDataOp: XDRCodable {
     }
 }
 
+extension ManageDataOp: Encodable {}
+
 public struct Signer: XDRDecodable {
     let key: SignerKey
     let weight: UInt32
@@ -202,6 +210,8 @@ public struct Signer: XDRDecodable {
         weight = try decoder.decode(UInt32.self)
     }
 }
+
+extension Signer: Encodable {}
 
 public struct Price: XDRDecodable {
     let n: Int32

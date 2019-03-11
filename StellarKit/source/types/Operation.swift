@@ -142,3 +142,45 @@ public struct Operation: XDRCodable {
     }
 }
 
+extension Operation: Encodable {
+    enum CodingKeys: String, CodingKey {
+        case body, type
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch body {
+        case .CREATE_ACCOUNT:
+            try container.encode("payment", forKey: .type)
+            try container.encode(body, forKey: .body)
+
+        case .PAYMENT:
+            try container.encode("payment", forKey: .type)
+            try container.encode(body, forKey: .body)
+
+        default:
+            try container.encode("op", forKey: .type)
+            try container.encode(body, forKey: .body)
+        }
+    }
+
+}
+
+extension Operation.Body: Encodable {
+    func encode(to encoder: Encoder) throws {
+        switch self {
+        case .CREATE_ACCOUNT(let op):
+            var container = encoder.singleValueContainer()
+            try container.encode(op)
+
+        case .PAYMENT(let op):
+            var container = encoder.singleValueContainer()
+            try container.encode(op)
+
+        default:
+            var container = encoder.singleValueContainer()
+            try container.encode("some operation")
+        }
+    }
+}

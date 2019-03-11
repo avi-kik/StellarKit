@@ -39,7 +39,7 @@ struct MockStellarAccount: Account {
 
 class StellarIntegrationTests: XCTestCase {
     var endpoint: String { return "http://localhost:8000" }
-    var networkId: NetworkId { return .custom("private testnet") }
+    var networkId: NetworkId { return .init("private testnet") }
 
     let asset = Asset(assetCode: "TEST_ASSET",
                       issuer: "GBSJ7KFU2NXACVHVN2VWQIXIV5FWH6A7OIDDTEUYTCJYGY3FJMYIDTU7")!
@@ -102,7 +102,8 @@ class StellarIntegrationTests: XCTestCase {
         TxBuilder(source: funder, node: node)
             .add(operation: StellarKit.Operation.createAccount(destination: account.publicKey,
                                                                balance: balance))
-            .post()
+            .signedEnvelope()
+            .post(to: node)
             .then { _ in e.fulfill() }
             .error {
                 if ($0 as? Responses.RequestFailure)?.isExistingAccount == true {

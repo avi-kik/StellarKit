@@ -8,13 +8,13 @@
 
 import Foundation
 
-typealias Hash = WrappedData32
-typealias UpgradeType = Data
+public typealias Hash = WrappedData32
+public typealias UpgradeType = Data
 
-public struct StellarValue: XDRDecodable {
-    let txSetHash: Hash
-    let closeTime: UInt64
-    let upgrades: [UpgradeType]
+public struct StellarValue: XDRDecodable, XDREncodableStruct {
+    public let txSetHash: Hash
+    public let closeTime: UInt64
+    public let upgrades: [UpgradeType]
     let reserved: Int32 = 0
 
     public init(from decoder: XDRDecoder) throws {
@@ -27,22 +27,40 @@ public struct StellarValue: XDRDecodable {
 
 extension StellarValue: Encodable {}
 
-public struct LedgerHeader: XDRDecodable {
-    let ledgerVersion: UInt32
-    let previousLedgerHash: Hash
-    let scpValue: StellarValue
-    let txSetResultHash: Hash
-    let bucketListHash: Hash
-    let ledgerSeq: UInt32
-    let totalCoins: Int64
-    let feePool: Int64
-    let inflationSeq: UInt32
-    let idPool: UInt64
-    let baseFee: UInt32
-    let baseReserve: UInt32
-    let maxTxSetSize: UInt32
-    let skipList: [Hash]
+public struct LedgerHeader: XDRDecodable, XDREncodable {
+    public let ledgerVersion: UInt32
+    public let previousLedgerHash: Hash
+    public let scpValue: StellarValue
+    public let txSetResultHash: Hash
+    public let bucketListHash: Hash
+    public let ledgerSeq: UInt32
+    public let totalCoins: Int64
+    public let feePool: Int64
+    public let inflationSeq: UInt32
+    public let idPool: UInt64
+    public let baseFee: UInt32
+    public let baseReserve: UInt32
+    public let maxTxSetSize: UInt32
+    public let skipList: WrappedArray4<Hash>
     let reserved: Int32 = 0
+
+    public func encode(to encoder: XDREncoder) throws {
+        try encoder.encode(ledgerVersion)
+        try encoder.encode(previousLedgerHash)
+        try encoder.encode(scpValue)
+        try encoder.encode(txSetResultHash)
+        try encoder.encode(bucketListHash)
+        try encoder.encode(ledgerSeq)
+        try encoder.encode(totalCoins)
+        try encoder.encode(feePool)
+        try encoder.encode(inflationSeq)
+        try encoder.encode(idPool)
+        try encoder.encode(baseFee)
+        try encoder.encode(baseReserve)
+        try encoder.encode(maxTxSetSize)
+        try encoder.encode(skipList)
+        try encoder.encode(reserved)
+    }
 
     public init(from decoder: XDRDecoder) throws {
         ledgerVersion = try decoder.decode(UInt32.self)
@@ -58,7 +76,7 @@ public struct LedgerHeader: XDRDecodable {
         baseFee = try decoder.decode(UInt32.self)
         baseReserve = try decoder.decode(UInt32.self)
         maxTxSetSize = try decoder.decode(UInt32.self)
-        skipList = try decoder.decode(WrappedArray4<Hash>.self).wrapped
+        skipList = try decoder.decode(WrappedArray4<Hash>.self)
         _ = try decoder.decode(Int32.self)
     }
 }
@@ -66,8 +84,8 @@ public struct LedgerHeader: XDRDecodable {
 extension LedgerHeader: Encodable {}
 
 public struct LedgerHeaderHistoryEntry: XDRDecodable {
-    let hash: Hash
-    let header: LedgerHeader
+    public let hash: Hash
+    public let header: LedgerHeader
     let reserved: Int32 = 0
 
     public init(from decoder: XDRDecoder) throws {
@@ -80,8 +98,8 @@ public struct LedgerHeaderHistoryEntry: XDRDecodable {
 extension LedgerHeaderHistoryEntry: Encodable {}
 
 public struct TransactionHistoryEntry: XDRDecodable {
-    let ledgerSeq: UInt32
-    let txSet: TransactionSet
+    public let ledgerSeq: UInt32
+    public let txSet: TransactionSet
     let reserved: Int32 = 0
 
     public init(from decoder: XDRDecoder) throws {
@@ -147,7 +165,7 @@ public enum BucketEntry: XDRDecodable {
 
     public init(from decoder: XDRDecoder) throws {
         let discriminant = try decoder.decode(UInt32.self)
-        
+
         switch discriminant {
         case 0: self = .LIVEENTRY(try decoder.decode(LedgerEntry.self))
         case 1: self = .DEADENTRY(try decoder.decode(LedgerKey.self))

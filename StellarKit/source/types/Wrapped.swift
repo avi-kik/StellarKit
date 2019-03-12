@@ -23,7 +23,7 @@ private func decodeData(from decoder: XDRDecoder, capacity: Int) throws -> Data 
     return d
 }
 
-protocol WrappedData: XDRCodable, Equatable, Encodable {
+public protocol WrappedData: XDRCodable, Equatable, Encodable {
     static var capacity: Int { get }
 
     var wrapped: Data { get set }
@@ -35,16 +35,16 @@ protocol WrappedData: XDRCodable, Equatable, Encodable {
 }
 
 extension WrappedData {
-    func encode(to encoder: XDREncoder) throws {
+    public func encode(to encoder: XDREncoder) throws {
         try wrapped.forEach { try $0.encode(to: encoder) }
     }
 
-    init(from decoder: XDRDecoder) throws {
+    public init(from decoder: XDRDecoder) throws {
         self.init()
         wrapped = try decodeData(from: decoder, capacity: Self.capacity)
     }
 
-    init<S: Sequence>(_ sequence: S) where S.Element == UInt8 {
+    public init<S: Sequence>(_ sequence: S) where S.Element == UInt8 {
         self.init()
 
         let data = Data(sequence)
@@ -60,50 +60,50 @@ extension WrappedData {
         }
     }
 
-    static func ==(lhs: Self, rhs: Self) -> Bool {
+    public static func ==(lhs: Self, rhs: Self) -> Bool {
         return lhs.wrapped == rhs.wrapped
     }
 }
 
 extension WrappedData {
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(wrapped.hexString)
     }
 }
 
-struct WrappedData4: WrappedData {
-    static let capacity: Int = 4
+public struct WrappedData4: WrappedData {
+    public static let capacity: Int = 4
 
-    var wrapped: Data
+    public var wrapped: Data
 
-    init() {
+    public init() {
         wrapped = Data()
     }
 }
 
-struct WrappedData12: WrappedData {
-    static let capacity: Int = 12
+public struct WrappedData12: WrappedData {
+    public static let capacity: Int = 12
 
-    var wrapped: Data
+    public var wrapped: Data
 
-    init() {
+    public init() {
         wrapped = Data()
     }
 }
 
-struct WrappedData32: WrappedData {
-    static let capacity: Int = 32
+public struct WrappedData32: WrappedData {
+    public static let capacity: Int = 32
 
-    var wrapped: Data
+    public var wrapped: Data
 
-    init() {
+    public init() {
         wrapped = Data()
     }
 }
 
-protocol WrappedArray: XDRDecodable {
-    associatedtype T: XDRDecodable
+public protocol WrappedArray: XDRCodable {
+    associatedtype T: XDRCodable
 
     var capacity: Int { get }
 
@@ -113,19 +113,30 @@ protocol WrappedArray: XDRDecodable {
 }
 
 extension WrappedArray {
-    init(from decoder: XDRDecoder) throws {
+    public init(from decoder: XDRDecoder) throws {
         self.init()
 
         for _ in 0 ..< capacity { wrapped.append(try decoder.decode(T.self)) }
     }
+
+    public func encode(to encoder: XDREncoder) throws {
+        for x in wrapped { try encoder.encode(x) }
+    }
 }
 
-struct WrappedArray4<T: XDRDecodable>: WrappedArray {
-    let capacity: Int = 4
+public struct WrappedArray4<T: XDRCodable>: WrappedArray {
+    public let capacity: Int = 4
 
-    var wrapped: [T]
+    public var wrapped: [T]
 
-    init() {
+    public init() {
         wrapped = []
+    }
+}
+
+extension WrappedArray4: Encodable where T: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(wrapped)
     }
 }

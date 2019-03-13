@@ -9,18 +9,56 @@
 import Foundation
 
 public typealias Hash = WrappedData32
-public typealias UpgradeType = Data
+
+public enum Upgrade: XDRDecodable {
+    case LEDGER_UPGRADE_VERSION(UInt32)
+    case LEDGER_UPGRADE_BASE_FEE(UInt32)
+    case LEDGER_UPGRADE_MAX_TX_SET_SIZE(UInt32)
+    case LEDGER_UPGRADE_BASE_RESERVE(UInt32)
+
+    public init(from decoder: XDRDecoder) throws {
+        let d = try decoder.decode(UInt32.self)
+        let v = try decoder.decode(UInt32.self)
+
+        switch d {
+        case 1: self = .LEDGER_UPGRADE_VERSION(v)
+        case 2: self = .LEDGER_UPGRADE_BASE_FEE(v)
+        case 3: self = .LEDGER_UPGRADE_MAX_TX_SET_SIZE(v)
+        case 4: self = .LEDGER_UPGRADE_BASE_RESERVE(v)
+        default: fatalError("Unknown upgrade")
+        }
+    }
+}
+
+extension Upgrade: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+
+        switch self {
+        case .LEDGER_UPGRADE_VERSION(let v):
+            try container.encode(["version": v])
+        case .LEDGER_UPGRADE_BASE_FEE(let v):
+            try container.encode(["base_fee": v])
+        case .LEDGER_UPGRADE_MAX_TX_SET_SIZE(let v):
+            try container.encode(["max_tx_set_size": v])
+        case .LEDGER_UPGRADE_BASE_RESERVE(let v):
+            try container.encode(["base_reserve": v])
+        }
+    }
+}
 
 public struct StellarValue: XDRDecodable, XDREncodableStruct {
     public let txSetHash: Hash
     public let closeTime: UInt64
-    public let upgrades: [UpgradeType]
+    public let upgrades: [Upgrade]
     let reserved: Int32 = 0
 
     public init(from decoder: XDRDecoder) throws {
         txSetHash = try decoder.decode(Hash.self)
         closeTime = try decoder.decode(UInt64.self)
         upgrades = try decoder.decode([Data].self)
+            .map { try XDRDecoder(data: $0).decode(Upgrade.self) }
+
         _ = try decoder.decode(Int32.self)
     }
 }

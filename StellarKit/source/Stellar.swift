@@ -131,7 +131,7 @@ extension Node {
         request.httpMethod = "POST"
         request.httpBody = httpBody
 
-        return HorizonRequest().post(request: request)
+        return Horizon().post(request: request)
             .then { data in
                 if let failure = try? JSONDecoder().decode(Responses.RequestFailure.self, from: data) {
                     throw failure

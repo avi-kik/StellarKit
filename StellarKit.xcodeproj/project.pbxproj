@@ -39,7 +39,7 @@
 		8287075321974F080031229D /* Sodium.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8287074721974EC40031229D /* Sodium.framework */; };
 		8291DA9820353E02002C10F5 /* StellarEventSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8291DA9720353E01002C10F5 /* StellarEventSource.swift */; };
 		829B374F21144EF900819BA0 /* TxBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829B374E21144EF900819BA0 /* TxBuilder.swift */; };
-		82AA911521AFBCEE00CEF370 /* HorizonRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82AA911421AFBCEE00CEF370 /* HorizonRequest.swift */; };
+		82AA911521AFBCEE00CEF370 /* Horizon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82AA911421AFBCEE00CEF370 /* Horizon.swift */; };
 		82AA911D21B0F26E00CEF370 /* HorizonRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82AA911C21B0F26E00CEF370 /* HorizonRequestTests.swift */; };
 		82BA1EA8204D0EB300396AE2 /* TestKeyUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82BA1EA7204D0EB300396AE2 /* TestKeyUtils.swift */; };
 		82BA2047204D856100396AE2 /* Wrapped.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82343AA92024A97900848CF4 /* Wrapped.swift */; };
@@ -210,7 +210,7 @@
 		828CB54C205E24CD007C679C /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		8291DA9720353E01002C10F5 /* StellarEventSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StellarEventSource.swift; sourceTree = "<group>"; };
 		829B374E21144EF900819BA0 /* TxBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxBuilder.swift; sourceTree = "<group>"; };
-		82AA911421AFBCEE00CEF370 /* HorizonRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizonRequest.swift; sourceTree = "<group>"; };
+		82AA911421AFBCEE00CEF370 /* Horizon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Horizon.swift; sourceTree = "<group>"; };
 		82AA911C21B0F26E00CEF370 /* HorizonRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizonRequestTests.swift; sourceTree = "<group>"; };
 		82BA1EA7204D0EB300396AE2 /* TestKeyUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestKeyUtils.swift; sourceTree = "<group>"; };
 		82BA20A0204D856100396AE2 /* StellarKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StellarKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -316,7 +316,7 @@
 				824063AB20147DCD0055D70A /* types */,
 				824138522060ADF300D7117E /* Endpoint.swift */,
 				828CB54C205E24CD007C679C /* Errors.swift */,
-				82AA911421AFBCEE00CEF370 /* HorizonRequest.swift */,
+				82AA911421AFBCEE00CEF370 /* Horizon.swift */,
 				82ECAB8B2003290F0010E31F /* KeyUtils.swift */,
 				8233380221B3B56400975BC9 /* Misc+extensions.swift */,
 				8240BAF52028EAE0003F08FB /* Responses.swift */,
@@ -675,7 +675,7 @@
 				8240BAF62028EAE0003F08FB /* Responses.swift in Sources */,
 				824063B520147DCD0055D70A /* Transaction.swift in Sources */,
 				82DA96E621BE4D37005AFC77 /* XDRCodable.swift in Sources */,
-				82AA911521AFBCEE00CEF370 /* HorizonRequest.swift in Sources */,
+				82AA911521AFBCEE00CEF370 /* Horizon.swift in Sources */,
 				829B374F21144EF900819BA0 /* TxBuilder.swift in Sources */,
 				824063B120147DCD0055D70A /* Asset.swift in Sources */,
 				82ECAB8C2003290F0010E31F /* KeyUtils.swift in Sources */,

@@ -46,7 +46,7 @@ class HorizonRequestsTests: XCTestCase {
         let e1 = expectation(description: "")
         let e2 = expectation(description: "")
 
-        let requestor = HorizonRequest()
+        let requestor = Horizon()
 
         requestor.get(url: Endpoint.transaction(txId1).url(with: base))
             .then({ (response: Responses.Transaction) in

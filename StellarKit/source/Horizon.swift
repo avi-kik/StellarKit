@@ -18,7 +18,7 @@ fileprivate class RequestState {
     }
 }
 
-class Horizon {
+public class Horizon {
     let wrapper = SessionWrapper()
 
     deinit {
@@ -27,7 +27,7 @@ class Horizon {
 
     private struct E: Error { let horizonError: Responses.RequestFailure }
 
-    func get<T: Decodable>(url: URL) -> Promise<T> {
+    public func get<T: Decodable>(url: URL) -> Promise<T> {
         let p = Promise<T>()
 
         let task = wrapper.session.dataTask(with: url)
@@ -57,7 +57,7 @@ class Horizon {
         return p
     }
 
-    func post(request: URLRequest) -> Promise<Data> {
+    public func post(request: URLRequest) -> Promise<Data> {
         let p = Promise<Data>()
 
         let task = wrapper.session.dataTask(with: request)

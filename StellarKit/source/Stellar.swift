@@ -107,10 +107,13 @@ extension Node {
 
      - parameter envelope: The transaction envelope to post.  Envelopes can be obtained
      from a `TxBuilder` instance.
+     - parameter using: An instance of Horizon with which to post.  Providing
+     an instance allows for a single `URLSession` to be used.
 
      - Returns: A promise which will be signalled with the result of the POST operation.
      */
-    public func post(envelope: TransactionEnvelope) -> Promise<Responses.TransactionSuccess> {
+    public func post(envelope: TransactionEnvelope,
+                     using horizon: Horizon? = nil) -> Promise<Responses.TransactionSuccess> {
         let envelopeData: Data
         do {
             envelopeData = try Data(XDREncoder.encode(envelope))
@@ -131,7 +134,7 @@ extension Node {
         request.httpMethod = "POST"
         request.httpBody = httpBody
 
-        return Horizon().post(request: request)
+        return (horizon ?? Horizon()).post(request: request)
             .then { data in
                 if let failure = try? JSONDecoder().decode(Responses.RequestFailure.self, from: data) {
                     throw failure
@@ -236,15 +239,17 @@ extension Transaction {
 }
 
 extension TransactionEnvelope {
-    public func post(to node: Node) -> Promise<Responses.TransactionSuccess> {
-        return node.post(envelope: self)
+    public func post(to node: Node,
+                     using horizon: Horizon? = nil) -> Promise<Responses.TransactionSuccess> {
+        return node.post(envelope: self, using: horizon)
     }
 }
 
 extension Promise where Value == TransactionEnvelope {
-    public func post(to node: Node) -> Promise<Responses.TransactionSuccess> {
+    public func post(to node: Node,
+                     using horizon: Horizon? = nil) -> Promise<Responses.TransactionSuccess> {
         return self.then({
-            return node.post(envelope: $0)
+            return node.post(envelope: $0, using: horizon)
         })
     }
 }

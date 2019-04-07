@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import StellarKit
+@testable import StellarKit
 import Sodium
 
 enum KeyUtilsError: Error {
@@ -15,6 +15,7 @@ enum KeyUtilsError: Error {
     case decodingFailed (String)
     case hashingFailed
     case passphraseIncorrect
+    case signingFailed
     case unknownError
 }
 
@@ -24,7 +25,7 @@ public struct TestKeyUtils {
     }
 
     public static func keyPair(from seed: String) -> Sign.KeyPair? {
-        return Sodium().sign.keyPair(seed: KeyUtils.key(base32: seed))
+        return Sodium().sign.keyPair(seed: StellarKey(seed)!.key)
     }
 
     public static func seed(from passphrase: String,
@@ -86,7 +87,7 @@ public struct TestKeyUtils {
         guard let signature = Sodium().sign.signature(message: message.array,
                                                       secretKey: signingKey) else
         {
-            throw StellarError.signingFailed
+            throw KeyUtilsError.signingFailed
         }
 
         return signature

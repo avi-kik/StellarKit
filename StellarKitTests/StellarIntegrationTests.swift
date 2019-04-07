@@ -12,28 +12,30 @@ import KinUtil
 import Sodium
 
 struct MockStellarAccount: Account {
-    private var _publicKey: String?
+    var stellarKey: StellarKey
 
-    var publicKey: String {
-        return _publicKey ?? KeyUtils.base32(publicKey: keyPair!.publicKey)
+    init(stellarKey: StellarKey) {
+        self.stellarKey = stellarKey
     }
 
     var keyPair: Sign.KeyPair?
 
-    func sign(_ message: Data) throws -> [UInt8] {
-        return try TestKeyUtils.sign(message: message, signingKey: keyPair!.secretKey)
+    func sign<S: Sequence>(_ message: S) throws -> [UInt8] where S.Element == UInt8 {
+        return try TestKeyUtils.sign(message: Data(message), signingKey: keyPair!.secretKey)
     }
 
     init() {
-        self.init(seedStr: KeyUtils.base32(seed: TestKeyUtils.seed()!))
+        self.init(seedStr: StellarKey(TestKeyUtils.seed()!,
+                                      type: .ed25519SecretSeed).description)
     }
 
     init(publicKey: String) {
-        _publicKey = publicKey
+        stellarKey = StellarKey(publicKey)!
     }
 
     init(seedStr: String) {
         keyPair = TestKeyUtils.keyPair(from: seedStr)
+        stellarKey = StellarKey(keyPair!.publicKey)
     }
 }
 
@@ -100,7 +102,7 @@ class StellarIntegrationTests: XCTestCase {
         let e = expectation(description: "createIfNecessary")
 
         TxBuilder(source: funder, node: node)
-            .add(operation: StellarKit.Operation.createAccount(destination: account.publicKey,
+            .add(operation: StellarKit.Operation.createAccount(destination: account.stellarKey,
                                                                balance: balance))
             .signedEnvelope()
             .post(to: node)
@@ -135,7 +137,7 @@ class StellarIntegrationTests: XCTestCase {
         var triggered = false
 
         txWatch = node.txWatch(lastEventId: nil)
-        txWatch?.emitter.on(next: { _ in
+        txWatch?.on(next: { _ in
             if !triggered { e.fulfill() }
             triggered = true
         }).add(to: linkBag)
@@ -151,7 +153,7 @@ class StellarIntegrationTests: XCTestCase {
         var triggered = false
 
         txWatch = node.txWatch(lastEventId: "now")
-        txWatch?.emitter.on(next: { _ in
+        txWatch?.on(next: { _ in
             if !triggered { e.fulfill() }
             triggered = true
         }).add(to: linkBag)
@@ -169,7 +171,7 @@ class StellarIntegrationTests: XCTestCase {
         var triggered = false
 
         paymentWatch = node.paymentWatch(lastEventId: nil)
-        paymentWatch?.emitter.on(next: { _ in
+        paymentWatch?.on(next: { _ in
             if !triggered { e.fulfill() }
             triggered = true
         }).add(to: linkBag)
@@ -185,7 +187,7 @@ class StellarIntegrationTests: XCTestCase {
         var triggered = false
 
         paymentWatch = node.paymentWatch(lastEventId: "now")
-        paymentWatch?.emitter.on(next: { _ in
+        paymentWatch?.on(next: { _ in
             if !triggered { e.fulfill() }
             triggered = true
         }).add(to: linkBag)

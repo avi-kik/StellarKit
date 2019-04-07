@@ -33,7 +33,7 @@ extension XDREncodableStruct {
 public class XDREncoder {
     private var data = Data()
 
-    public static func encode<T>(_ value: T) throws -> Data where T: XDREncodable {
+    public static func encode<T: XDREncodable>(_ value: T) throws -> Data {
         let encoder = XDREncoder()
 
         try encoder.encode(value)
@@ -41,7 +41,7 @@ public class XDREncoder {
         return encoder.data
     }
 
-    public static func encode<T>(_ value: T?) throws -> Data where T: XDREncodable {
+    public static func encode<T: XDREncodable>(_ value: T?) throws -> Data {
         let encoder = XDREncoder()
 
         try encoder.encode(value)
@@ -49,11 +49,11 @@ public class XDREncoder {
         return encoder.data
     }
 
-    func encode<T>(_ value: T) throws where T: XDREncodable {
+    func encode<T: XDREncodable>(_ value: T) throws {
         try value.encode(to: self)
     }
 
-    func encode<T>(_ value: T?) throws where T: XDREncodable {
+    func encode<T: XDREncodable>(_ value: T?) throws {
         if let v = value {
             try self.encode(Int32(1))
             try v.encode(to: self)
@@ -103,24 +103,23 @@ public class XDRDecoder {
         self.data = data
     }
 
-    fileprivate func read(_ byteCount: Int, into: UnsafeMutableRawPointer) throws {
-        guard cursor + byteCount <= data.count else { throw Errors.prematureEndOfData }
-
-        data.withUnsafeBytes({ (ptr: UnsafePointer<UInt8>) -> () in
-            let from = ptr + cursor
-            memcpy(into, from, byteCount)
-        })
-
-        advance(by: byteCount)
-    }
-
-    fileprivate func read(_ count: Int) throws -> [UInt8] {
+    public func read(_ count: Int) throws -> [UInt8] {
         guard cursor + count <= data.count else { throw Errors.prematureEndOfData }
 
-        let bytes = data[cursor ..< cursor + count]
-        advance(by: count)
+        defer { advance(by: count) }
 
-        return bytes.map { $0 }
+        return data[cursor ..< cursor + count].array
+    }
+
+    fileprivate func read<T: FixedWidthInteger>(_ type: T.Type) throws -> T {
+        let byteCount = MemoryLayout<T>.size
+
+        guard cursor + byteCount <= data.count else { throw Errors.prematureEndOfData }
+
+        defer { advance(by: byteCount) }
+
+        return data[cursor ..< cursor + byteCount]
+            .reduce(T(0), { $0 << 8 | T($1) })
     }
 
     fileprivate func advance(by count: Int) { cursor += count }
@@ -138,17 +137,13 @@ extension Bool: XDRCodable {
 
 extension FixedWidthInteger where Self: XDRCodable {
     public init(from decoder: XDRDecoder) throws {
-        var v = Self.init()
-        try decoder.read(Self.bitWidth / 8, into: &v)
-        self = Self.init(bigEndian: v)
+        self = try decoder.read(Self.self)
     }
 
     public func encode(to encoder: XDREncoder) throws {
         var v = self.bigEndian
 
-        withUnsafeBytes(of: &v) {
-            encoder.append($0.map { $0 })
-        }
+        withUnsafeBytes(of: &v, encoder.append)
     }
 }
 

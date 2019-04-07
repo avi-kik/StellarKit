@@ -58,19 +58,19 @@ public enum Asset: XDRCodable, Equatable {
         }
     }
 
-    public init?(assetCode: String, issuer: String) {
+    public init?(assetCode: String, issuer: StellarKey) {
         guard let codeData = assetCode.data(using: .utf8) else {
             return nil
         }
 
         if codeData.count <= 4 {
             let a4 = Alpha4(assetCode: WrappedData4(codeData),
-                            issuer: PublicKey(WrappedData32(KeyUtils.key(base32: issuer))))
+                            issuer: PublicKey(issuer))
             self = .ASSET_TYPE_CREDIT_ALPHANUM4(a4)
         }
         else if codeData.count <= 12 {
             let a12 = Alpha12(assetCode: WrappedData12(codeData),
-                              issuer: PublicKey(WrappedData32(KeyUtils.key(base32: issuer))))
+                              issuer: PublicKey(issuer))
             self = .ASSET_TYPE_CREDIT_ALPHANUM12(a12)
         }
         else {

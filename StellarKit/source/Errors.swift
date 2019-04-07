@@ -14,7 +14,6 @@ public enum StellarError: Error {
     case urlEncodingFailed
     case dataEncodingFailed
     case dataDecodingFailed
-    case signingFailed
 }
 
 extension StellarError: LocalizedError {

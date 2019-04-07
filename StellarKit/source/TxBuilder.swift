@@ -24,7 +24,7 @@ public final class TxBuilder {
 
         signers = [source]
 
-        _tx = tx ?? Transaction(sourceAccount: source.publicKey,
+        _tx = tx ?? Transaction(sourceAccount: source.stellarKey,
                                 seqNum: 0,
                                 timeBounds: nil,
                                 memo: .MEMO_NONE,

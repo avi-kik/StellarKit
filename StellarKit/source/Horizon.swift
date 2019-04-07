@@ -19,13 +19,13 @@ fileprivate class RequestState {
 }
 
 public class Horizon {
-    let wrapper = SessionWrapper()
+    private let wrapper = SessionWrapper()
 
+    public init() {}
+    
     deinit {
         wrapper.session.finishTasksAndInvalidate()
     }
-
-    private struct E: Error { let horizonError: Responses.RequestFailure }
 
     public func get<T: Decodable>(url: URL) -> Promise<T> {
         let p = Promise<T>()
@@ -68,7 +68,10 @@ public class Horizon {
             }
 
             if let data = data {
-                p.signal(data)
+                if let e = try? JSONDecoder().decode(Responses.RequestFailure.self, from: data) {
+                    p.signal(e)
+                }
+                else { p.signal(data) }
             }
         }
 
@@ -83,8 +86,6 @@ public class Horizon {
 class SessionWrapper: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate {
     fileprivate var session: URLSession
     fileprivate var tasks = [URLSessionTask: RequestState]()
-
-    var shouldInvalidateAfterCompletion = true
 
     override init() {
         session = URLSession(configuration: URLSessionConfiguration.default)

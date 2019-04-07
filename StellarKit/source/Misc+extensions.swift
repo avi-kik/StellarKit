@@ -17,7 +17,7 @@ extension DateFormatter {
 }
 
 public extension Data {
-    var sha256: Data {
-        return Data(bytes: SHA256([UInt8](self)).digest())
+    var sha256: [UInt8] {
+        return SHA256(self.array).digest()
     }
 }

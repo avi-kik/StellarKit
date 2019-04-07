@@ -49,7 +49,7 @@
 		82BA204D204D856100396AE2 /* Responses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8240BAF52028EAE0003F08FB /* Responses.swift */; };
 		82BA204F204D856100396AE2 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824063B020147DCD0055D70A /* Transaction.swift */; };
 		82BA2052204D856100396AE2 /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824063AC20147DCD0055D70A /* Asset.swift */; };
-		82BA2053204D856100396AE2 /* KeyUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82ECAB8B2003290F0010E31F /* KeyUtils.swift */; };
+		82BA2053204D856100396AE2 /* StellarKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82ECAB8B2003290F0010E31F /* StellarKey.swift */; };
 		82BA2054204D856100396AE2 /* PublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824063AF20147DCD0055D70A /* PublicKey.swift */; };
 		82BA2055204D856100396AE2 /* Stellar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82340BDC1FFE24EE0034204F /* Stellar.swift */; };
 		82BA2056204D856100396AE2 /* StellarOps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82191578204BC7D300450864 /* StellarOps.swift */; };
@@ -58,7 +58,7 @@
 		82BA2063204D856100396AE2 /* StellarKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 82340B9F1FFDF2DA0034204F /* StellarKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		82C07A842236396000AC90BC /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82C07A832236396000AC90BC /* History.swift */; };
 		82DA96E621BE4D37005AFC77 /* XDRCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82DA96E021BE4D37005AFC77 /* XDRCodable.swift */; };
-		82ECAB8C2003290F0010E31F /* KeyUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82ECAB8B2003290F0010E31F /* KeyUtils.swift */; };
+		82ECAB8C2003290F0010E31F /* StellarKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82ECAB8B2003290F0010E31F /* StellarKey.swift */; };
 		82EE995120762BD8004CF368 /* XDRTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82EE995020762BD8004CF368 /* XDRTests.swift */; };
 		82F2FAE9204317A100E754BD /* KinUtil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82F2FAEA204317A100E754BD /* KinUtil.framework */; };
 /* End PBXBuildFile section */
@@ -217,7 +217,7 @@
 		82BA20A1204D856100396AE2 /* StellarKit-macos-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "StellarKit-macos-Info.plist"; path = "/Users/avi/Projects/kin-core-ios/KinSDK/StellarKit/StellarKit-macos-Info.plist"; sourceTree = "<absolute>"; };
 		82C07A832236396000AC90BC /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		82DA96E021BE4D37005AFC77 /* XDRCodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XDRCodable.swift; sourceTree = "<group>"; };
-		82ECAB8B2003290F0010E31F /* KeyUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyUtils.swift; sourceTree = "<group>"; };
+		82ECAB8B2003290F0010E31F /* StellarKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StellarKey.swift; sourceTree = "<group>"; };
 		82EE995020762BD8004CF368 /* XDRTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XDRTests.swift; sourceTree = "<group>"; };
 		82F2FADD2043172A00E754BD /* KinUtil.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = KinUtil.xcodeproj; path = "kin-util-ios/KinUtil/KinUtil.xcodeproj"; sourceTree = "<group>"; };
 		82F2FAEA204317A100E754BD /* KinUtil.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KinUtil.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -317,11 +317,11 @@
 				824138522060ADF300D7117E /* Endpoint.swift */,
 				828CB54C205E24CD007C679C /* Errors.swift */,
 				82AA911421AFBCEE00CEF370 /* Horizon.swift */,
-				82ECAB8B2003290F0010E31F /* KeyUtils.swift */,
 				8233380221B3B56400975BC9 /* Misc+extensions.swift */,
 				8240BAF52028EAE0003F08FB /* Responses.swift */,
 				82340BDC1FFE24EE0034204F /* Stellar.swift */,
 				8291DA9720353E01002C10F5 /* StellarEventSource.swift */,
+				82ECAB8B2003290F0010E31F /* StellarKey.swift */,
 				82191578204BC7D300450864 /* StellarOps.swift */,
 				82340C44200138E50034204F /* StellarResults.swift */,
 				829B374E21144EF900819BA0 /* TxBuilder.swift */,
@@ -678,7 +678,7 @@
 				82AA911521AFBCEE00CEF370 /* Horizon.swift in Sources */,
 				829B374F21144EF900819BA0 /* TxBuilder.swift in Sources */,
 				824063B120147DCD0055D70A /* Asset.swift in Sources */,
-				82ECAB8C2003290F0010E31F /* KeyUtils.swift in Sources */,
+				82ECAB8C2003290F0010E31F /* StellarKey.swift in Sources */,
 				824063B420147DCD0055D70A /* PublicKey.swift in Sources */,
 				82C07A842236396000AC90BC /* History.swift in Sources */,
 				82340BDD1FFE24EE0034204F /* Stellar.swift in Sources */,
@@ -725,7 +725,7 @@
 				82BA204F204D856100396AE2 /* Transaction.swift in Sources */,
 				82BA2052204D856100396AE2 /* Asset.swift in Sources */,
 				824138902061720300D7117E /* Watches.swift in Sources */,
-				82BA2053204D856100396AE2 /* KeyUtils.swift in Sources */,
+				82BA2053204D856100396AE2 /* StellarKey.swift in Sources */,
 				82BA2054204D856100396AE2 /* PublicKey.swift in Sources */,
 				82BA2055204D856100396AE2 /* Stellar.swift in Sources */,
 				82BA2056204D856100396AE2 /* StellarOps.swift in Sources */,

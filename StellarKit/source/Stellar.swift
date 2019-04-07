@@ -135,29 +135,24 @@ extension Node {
         request.httpBody = httpBody
 
         return (horizon ?? Horizon()).post(request: request)
-            .then { data in
-                if let failure = try? JSONDecoder().decode(Responses.RequestFailure.self, from: data) {
-                    throw failure
-                }
-
-                let txResponse = try JSONDecoder().decode(Responses.TransactionSuccess.self,
-                                                          from: data)
-                return Promise(txResponse)
+            .then {
+                return try JSONDecoder()
+                    .decode(Responses.TransactionSuccess.self, from: $0)
         }
     }
 }
 
 public protocol Account {
-    var publicKey: String { get }
+    var stellarKey: StellarKey { get }
     
-    func sign(_ message: Data) throws -> [UInt8]
+    func sign<S: Sequence>(_ message: S) throws -> [UInt8] where S.Element == UInt8
 
-    init(publicKey: String)
+    init(stellarKey: StellarKey)
 }
 
 extension Account {
     public func details(node: Node) -> Promise<Responses.AccountDetails> {
-        return Endpoint.account(publicKey).get(from: node.baseURL)
+        return Endpoint.account(String(stellarKey)).get(from: node.baseURL)
     }
 
     public func sequence(seqNum: UInt64 = 0, node: Node) -> Promise<UInt64> {
@@ -201,7 +196,7 @@ extension Account {
      - Returns: An instance of `EventWatcher`, which contains an `Observable` which emits `TxEvent` objects.
      */
     public func txWatch(lastEventId: String?, node: Node) -> EventWatcher<TxEvent> {
-        let url = Endpoint.account(publicKey)
+        let url = Endpoint.account(String(stellarKey))
             .transactions()
             .cursor(lastEventId)
             .url(with: node.baseURL)
@@ -219,7 +214,7 @@ extension Account {
      - Returns: An instance of `EventWatcher`, which contains an `Observable` which emits `PaymentEvent` objects.
      */
     public func paymentWatch(lastEventId: String?, node: Node) -> EventWatcher<PaymentEvent> {
-        let url = Endpoint.account(publicKey)
+        let url = Endpoint.account(String(stellarKey))
             .payments()
             .cursor(lastEventId)
             .url(with: node.baseURL)
@@ -232,7 +227,7 @@ extension Transaction {
     public func signature(using account: Account, for node: Node) throws -> DecoratedSignature {
         let sig = try account.sign(self.hash(networkId: node.networkId.identifier))
 
-        let hint = WrappedData4(KeyUtils.key(base32: account.publicKey).suffix(4))
+        let hint = WrappedData4(account.stellarKey.key.suffix(4))
 
         return DecoratedSignature(hint: hint, signature: sig)
     }

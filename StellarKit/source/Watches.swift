@@ -134,8 +134,12 @@ extension PaymentEvent {
             return .ASSET_TYPE_NATIVE
         }
 
-        if let asset_code = asset_code, let asset_issuer = asset_issuer {
-            return Asset(assetCode: asset_code, issuer: asset_issuer)!
+        if
+            let asset_code = asset_code,
+            let asset_issuer = asset_issuer,
+            let issuer = StellarKey(asset_issuer)
+        {
+            return Asset(assetCode: asset_code, issuer: issuer)!
         }
 
         fatalError("Could not determine asset from payment: \(self)")
@@ -145,11 +149,10 @@ extension PaymentEvent {
 //MARK: -
 
 public final class EventWatcher<EventType> where EventType: Decodable {
-    public let emitter: Observable<EventType>
-
     public var lastEventId: String? { return eventSource.lastEventId }
 
     private let eventSource: StellarEventSource
+    private let emitter: Observable<EventType>
 
     init(eventSource: StellarEventSource) {
         self.eventSource = eventSource

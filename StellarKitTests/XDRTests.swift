@@ -8,8 +8,17 @@
 
 import XCTest
 import StellarKit
+import KinUtil
 
 class XDRTests: XCTestCase {
+
+    func test_moo() {
+        print("SCEGOAM5GBKZVXGYKUI2MKVU5UVLY4VY3NDVSXONH77K75AXPAS2LUKH" as StellarKey)
+        print(("SCEGOAM5GBKZVXGYKUI2MKVU5UVLY4VY3NDVSXONH77K75AXPAS2LUKH" as StellarKey).type)
+        print(StellarKey("SCEGOAM5GBKZVXGYKUI2MKVU5UVLY4VY3NDVSXONH77K75AXPAS2LUKH")!)
+        print(StellarKey(Array(repeating: 7, count: 32)))
+        print(StellarKey(Array(repeating: 7, count: 32), type: .ed25519SecretSeed))
+    }
 
     func test_bool() {
         let a: Bool = true

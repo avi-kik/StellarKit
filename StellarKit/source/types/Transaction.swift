@@ -147,13 +147,13 @@ public struct Transaction: XDRCodable {
         return nil
     }
 
-    public init(sourceAccount: String,
+    public init(sourceAccount: StellarKey,
                 seqNum: UInt64,
                 timeBounds: TimeBounds?,
                 memo: Memo,
                 fee: UInt32,
                 operations: [Operation]) {
-        self.init(sourceAccount: PublicKey(WD32(KeyUtils.key(base32: sourceAccount))),
+        self.init(sourceAccount: PublicKey(sourceAccount),
                   seqNum: seqNum,
                   timeBounds: timeBounds,
                   memo: memo,
@@ -195,7 +195,7 @@ public struct Transaction: XDRCodable {
         try encoder.encode(reserved)
     }
     
-    public func hash(networkId: String) throws -> Data {
+    public func hash(networkId: String) throws -> [UInt8] {
         let payload = try TransactionSignaturePayload(tx: self, networkId: networkId)
         return try XDREncoder.encode(payload).sha256
     }

@@ -12,24 +12,24 @@ extension Operation {
     private static func sourceKey(from source: Account?) -> PublicKey? {
         guard let source = source  else { return nil }
 
-        return PublicKey(WD32(KeyUtils.key(base32: source.publicKey)))
+        return PublicKey(WD32(source.stellarKey.key))
     }
 
-    public static func createAccount(destination: String,
+    public static func createAccount(destination: StellarKey,
                                      balance: Int64,
                                      source: Account? = nil) -> Operation {
-        let destPK = PublicKey(WD32(KeyUtils.key(base32: destination)))
+        let destPK = PublicKey(destination)
 
         return Operation(sourceAccount: sourceKey(from: source),
                          body: Operation.Body.CREATE_ACCOUNT(CreateAccountOp(destination: destPK,
                                                                              balance: balance)))
     }
     
-    public static func payment(destination: String,
+    public static func payment(destination: StellarKey,
                                amount: Int64,
                                asset: Asset,
                                source: Account? = nil) -> Operation {
-        let destPK = PublicKey(WD32(KeyUtils.key(base32: destination)))
+        let destPK = PublicKey(destination)
 
         return Operation(sourceAccount: sourceKey(from: source),
                          body: Operation.Body.PAYMENT(PaymentOp(destination: destPK,

@@ -58,8 +58,12 @@ public enum Responses {
             }
 
             public var asset: Asset? {
-                if let assetCode = assetCode, let assetIssuer = assetIssuer {
-                    return Asset(assetCode: assetCode, issuer: assetIssuer)
+                if
+                    let assetCode = assetCode,
+                    let assetIssuer = assetIssuer,
+                    let issuer = StellarKey(assetIssuer)
+                {
+                    return Asset(assetCode: assetCode, issuer: issuer)
                 }
 
                 return Asset.ASSET_TYPE_NATIVE

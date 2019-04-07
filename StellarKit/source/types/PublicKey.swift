@@ -21,12 +21,12 @@ struct PublicKeyType {
 enum PublicKey: XDRCodable, Equatable {
     case PUBLIC_KEY_TYPE_ED25519 (WrappedData32)
 
-    var publicKey: String! {
+    var publicKey: String {
         if case .PUBLIC_KEY_TYPE_ED25519(let wrapper) = self {
-            return KeyUtils.base32(publicKey: wrapper.wrapped.array)
+            return StellarKey(wrapper.wrapped).description
         }
 
-        return nil
+        fatalError("unknown public key type")
     }
 
     init(from decoder: XDRDecoder) throws {
@@ -38,11 +38,13 @@ enum PublicKey: XDRCodable, Equatable {
     init(_ keyData: WrappedData32) {
         self = .PUBLIC_KEY_TYPE_ED25519(keyData)
     }
+
+    init(_ stellarKey: StellarKey) {
+        self = .PUBLIC_KEY_TYPE_ED25519(WrappedData32(stellarKey.key))
+    }
     
     private func discriminant() -> Int32 {
-        switch self {
-        case .PUBLIC_KEY_TYPE_ED25519: return PublicKeyType.PUBLIC_KEY_TYPE_ED25519
-        }
+        return PublicKeyType.PUBLIC_KEY_TYPE_ED25519
     }
     
     func encode(to encoder: XDREncoder) throws {
@@ -119,7 +121,7 @@ extension SignerKey: Encodable {
         var container = encoder.singleValueContainer()
         switch self {
         case .SIGNER_KEY_TYPE_ED25519(let data):
-            try container.encode(KeyUtils.base32(publicKey: data.wrapped.array))
+            try container.encode(StellarKey(data.wrapped).description)
         case .SIGNER_KEY_TYPE_HASH_X(let data),
              .SIGNER_KEY_TYPE_PRE_AUTH_TX(let data):
             try container.encode(data.wrapped.hexString)

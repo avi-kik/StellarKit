@@ -101,10 +101,11 @@ public class XDRDecoder {
 
     public init(data: Data) {
         self.data = data
+        cursor = data.startIndex
     }
 
     public func read(_ count: Int) throws -> [UInt8] {
-        guard cursor + count <= data.count else { throw Errors.prematureEndOfData }
+        guard cursor + count <= data.endIndex else { throw Errors.prematureEndOfData }
 
         defer { advance(by: count) }
 
@@ -114,7 +115,7 @@ public class XDRDecoder {
     fileprivate func read<T: FixedWidthInteger>(_ type: T.Type) throws -> T {
         let byteCount = MemoryLayout<T>.size
 
-        guard cursor + byteCount <= data.count else { throw Errors.prematureEndOfData }
+        guard cursor + byteCount <= data.endIndex else { throw Errors.prematureEndOfData }
 
         defer { advance(by: byteCount) }
 

@@ -152,7 +152,7 @@ extension Operation: Encodable {
 
         switch body {
         case .CREATE_ACCOUNT:
-            try container.encode("payment", forKey: .type)
+            try container.encode("create_account", forKey: .type)
             try container.encode(body, forKey: .body)
 
         case .PAYMENT:

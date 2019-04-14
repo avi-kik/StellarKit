@@ -144,6 +144,7 @@ extension Node {
 
 public protocol Account {
     var stellarKey: StellarKey { get }
+    var publicKey: String { get }
     
     func sign<S: Sequence>(_ message: S) throws -> [UInt8] where S.Element == UInt8
 
@@ -152,7 +153,7 @@ public protocol Account {
 
 extension Account {
     public func details(node: Node) -> Promise<Responses.AccountDetails> {
-        return Endpoint.account(String(stellarKey)).get(from: node.baseURL)
+        return Endpoint.account(publicKey).get(from: node.baseURL)
     }
 
     public func sequence(seqNum: UInt64 = 0, node: Node) -> Promise<UInt64> {

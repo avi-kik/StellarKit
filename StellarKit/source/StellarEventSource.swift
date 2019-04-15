@@ -33,11 +33,10 @@ public final class StellarEventSource: NSObject, URLSessionDataDelegate {
 
     public private(set) var lastEventId: String?
 
-    public private(set) var emitter: Observable<Event>!
+    public private(set) lazy var emitter = Observable<Event>()
 
     public init(url: URL) {
         self.url = url
-        self.emitter = Observable<Event>()
 
         super.init()
 
@@ -76,12 +75,11 @@ public final class StellarEventSource: NSObject, URLSessionDataDelegate {
     public func close() {
         state = .closed
 
-        emitter?.finish()
+        emitter.finish()
 
         task?.cancel()
         urlSession?.invalidateAndCancel()
         urlSession = nil
-        emitter = nil
     }
 
     private var lineEnding = ""
@@ -180,7 +178,7 @@ public final class StellarEventSource: NSObject, URLSessionDataDelegate {
                 let (id, eventName, data) = parse(event)
 
                 if eventName == "message" {
-                    emitter?.next(Event(id: id, event: eventName, data: data))
+                    emitter.next(Event(id: id, event: eventName, data: data))
                 }
             }
         }

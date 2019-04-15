@@ -143,8 +143,7 @@ extension Node {
 }
 
 public protocol Account {
-    var stellarKey: StellarKey { get }
-    var publicKey: String { get }
+    var publicKey: StellarKey { get }
     
     func sign<S: Sequence>(_ message: S) throws -> [UInt8] where S.Element == UInt8
 
@@ -153,7 +152,7 @@ public protocol Account {
 
 extension Account {
     public func details(node: Node) -> Promise<Responses.AccountDetails> {
-        return Endpoint.account(publicKey).get(from: node.baseURL)
+        return Endpoint.account(String(publicKey)).get(from: node.baseURL)
     }
 
     public func sequence(seqNum: UInt64 = 0, node: Node) -> Promise<UInt64> {
@@ -197,7 +196,7 @@ extension Account {
      - Returns: An instance of `EventWatcher`, which contains an `Observable` which emits `TxEvent` objects.
      */
     public func txWatch(lastEventId: String?, node: Node) -> EventWatcher<TxEvent> {
-        let url = Endpoint.account(String(stellarKey))
+        let url = Endpoint.account(String(publicKey))
             .transactions()
             .cursor(lastEventId)
             .url(with: node.baseURL)
@@ -215,7 +214,7 @@ extension Account {
      - Returns: An instance of `EventWatcher`, which contains an `Observable` which emits `PaymentEvent` objects.
      */
     public func paymentWatch(lastEventId: String?, node: Node) -> EventWatcher<PaymentEvent> {
-        let url = Endpoint.account(String(stellarKey))
+        let url = Endpoint.account(String(publicKey))
             .payments()
             .cursor(lastEventId)
             .url(with: node.baseURL)
@@ -228,7 +227,7 @@ extension Transaction {
     public func signature(using account: Account, for node: Node) throws -> DecoratedSignature {
         let sig = try account.sign(self.hash(networkId: node.networkId.identifier))
 
-        let hint = WrappedData4(account.stellarKey.key.suffix(4))
+        let hint = WrappedData4(account.publicKey.key.suffix(4))
 
         return DecoratedSignature(hint: hint, signature: sig)
     }

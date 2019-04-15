@@ -12,7 +12,7 @@ extension Operation {
     private static func sourceKey(from source: Account?) -> PublicKey? {
         guard let source = source  else { return nil }
 
-        return PublicKey(WD32(source.stellarKey.key))
+        return PublicKey(WD32(source.publicKey.key))
     }
 
     public static func createAccount(destination: StellarKey,

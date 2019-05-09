@@ -120,19 +120,12 @@
 			remoteGlobalIDString = 09A943C61A4EB5F500C8A04F;
 			remoteInfo = Sodium_iOS;
 		};
-		82BA20A4204D856100396AE2 /* PBXContainerItemProxy */ = {
+		82DC2E2922847175009F567B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 82F2FADD2043172A00E754BD /* KinUtil.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 82BA2040204D84AA00396AE2;
-			remoteInfo = "KinUtil-macos";
-		};
-		82BA20A6204D863700396AE2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 82F2FADD2043172A00E754BD /* KinUtil.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 82BA2033204D84AA00396AE2;
-			remoteInfo = "KinUtil-macos";
+			remoteGlobalIDString = 82039EB7227C0CE3002166DF;
+			remoteInfo = TestHost;
 		};
 		82ECAB94200380290010E31F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -214,7 +207,6 @@
 		82AA911C21B0F26E00CEF370 /* HorizonRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizonRequestTests.swift; sourceTree = "<group>"; };
 		82BA1EA7204D0EB300396AE2 /* TestKeyUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestKeyUtils.swift; sourceTree = "<group>"; };
 		82BA20A0204D856100396AE2 /* StellarKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StellarKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		82BA20A1204D856100396AE2 /* StellarKit-macos-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "StellarKit-macos-Info.plist"; path = "/Users/avi/Projects/kin-core-ios/KinSDK/StellarKit/StellarKit-macos-Info.plist"; sourceTree = "<absolute>"; };
 		82C07A832236396000AC90BC /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		82DA96E021BE4D37005AFC77 /* XDRCodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XDRCodable.swift; sourceTree = "<group>"; };
 		82ECAB8B2003290F0010E31F /* StellarKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StellarKey.swift; sourceTree = "<group>"; };
@@ -271,7 +263,6 @@
 				82340BC21FFDF3F30034204F /* StellarKitHost */,
 				82340B9D1FFDF2DA0034204F /* Products */,
 				82340BFC1FFE41AA0034204F /* Frameworks */,
-				82BA20A1204D856100396AE2 /* StellarKit-macos-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -401,7 +392,7 @@
 			children = (
 				82F2FAE32043172A00E754BD /* KinUtil.framework */,
 				82F2FAE52043172A00E754BD /* KinUtilTests.xctest */,
-				82BA20A5204D856100396AE2 /* KinUtil.framework */,
+				82DC2E2A22847175009F567B /* TestHost.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -498,7 +489,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				82BA20A7204D863700396AE2 /* PBXTargetDependency */,
 			);
 			name = "StellarKit-macos";
 			productName = SwiftyStellar;
@@ -604,11 +594,11 @@
 			remoteRef = 8287074E21974EC40031229D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		82BA20A5204D856100396AE2 /* KinUtil.framework */ = {
+		82DC2E2A22847175009F567B /* TestHost.app */ = {
 			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = KinUtil.framework;
-			remoteRef = 82BA20A4204D856100396AE2 /* PBXContainerItemProxy */;
+			fileType = wrapper.application;
+			path = TestHost.app;
+			remoteRef = 82DC2E2922847175009F567B /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		82F2FAE32043172A00E754BD /* KinUtil.framework */ = {
@@ -750,11 +740,6 @@
 			isa = PBXTargetDependency;
 			name = Sodium_iOS;
 			targetProxy = 8287075021974EDB0031229D /* PBXContainerItemProxy */;
-		};
-		82BA20A7204D863700396AE2 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "KinUtil-macos";
-			targetProxy = 82BA20A6204D863700396AE2 /* PBXContainerItemProxy */;
 		};
 		82ECAB95200380290010E31F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

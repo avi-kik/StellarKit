@@ -101,7 +101,7 @@ public struct AllowTrustOp: XDRCodable, XDREncodableStruct {
     }
 }
 
-public struct SetOptionsOp: XDRCodable, XDREncodableStruct {
+public struct SetOptionsOp: XDRCodable {
     let inflationDest: PublicKey?
     let clearFlags: UInt32?
     let setFlags: UInt32?
@@ -122,6 +122,18 @@ public struct SetOptionsOp: XDRCodable, XDREncodableStruct {
         highThreshold = try decoder.decode(UInt32?.self)
         homeDomain = try decoder.decode(String?.self)
         signer = try decoder.decode(Signer?.self)
+    }
+
+    public func encode(to encoder: XDREncoder) throws {
+        try encoder.encode(inflationDest)
+        try encoder.encode(clearFlags)
+        try encoder.encode(setFlags)
+        try encoder.encode(masterWeight)
+        try encoder.encode(lowThreshold)
+        try encoder.encode(medThreshold)
+        try encoder.encode(highThreshold)
+        try encoder.encode(homeDomain)
+        try encoder.encode(signer)
     }
 }
 
@@ -190,7 +202,7 @@ public struct ManageDataOp: XDRCodable {
 
 extension ManageDataOp: Encodable {}
 
-public struct Signer: XDRDecodable {
+public struct Signer: XDRCodable, XDREncodableStruct {
     let key: SignerKey
     let weight: UInt32
 

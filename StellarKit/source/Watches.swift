@@ -152,7 +152,7 @@ public final class EventWatcher<EventType> where EventType: Decodable {
     public var lastEventId: String? { return eventSource.lastEventId }
 
     private let eventSource: StellarEventSource
-    private let emitter: Observable<EventType>
+    private let emitter: Observer<EventType>
 
     init(eventSource: StellarEventSource) {
         self.eventSource = eventSource
@@ -175,7 +175,7 @@ public final class EventWatcher<EventType> where EventType: Decodable {
     }
 
     public func on(queue: DispatchQueue? = nil,
-                   next: @escaping (EventType) -> Void) -> Observable<EventType> {
+                   next: @escaping (EventType) -> Void) -> Observer<EventType> {
         return emitter.on(queue: queue, next: next)
     }
 }

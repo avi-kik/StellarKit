@@ -3,4 +3,4 @@
 	url = https://github.com/jedisct1/swift-sodium.git
 [submodule "kin-util-ios"]
 	path = kin-util-ios
-	url = https://github.com/kinfoundation/kin-util-ios.git
+	url = git@github.com:avi-kik/kin-util-ios.git

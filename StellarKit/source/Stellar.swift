@@ -17,10 +17,17 @@ public struct NetworkId {
 
     public init(_ identifier: String) { self.identifier = identifier }
 }
-
 extension NetworkId {
     public static var stellarMain: NetworkId { return NetworkId(stellarMainId) }
     public static var stellarTest: NetworkId { return NetworkId(stellarTestId) }
+}
+
+extension NetworkId: ExpressibleByStringLiteral {
+    public typealias StringLiteralType = String
+
+    public init(stringLiteral: StringLiteralType) {
+        self.identifier = stringLiteral
+    }
 }
 
 extension NetworkId: CustomStringConvertible {

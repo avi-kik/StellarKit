@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KinUtil
 
 struct CryptoKeyType {
     static let KEY_TYPE_ED25519: Int32 = 0

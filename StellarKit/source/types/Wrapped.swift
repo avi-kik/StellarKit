@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KinUtil
 
 typealias WD4 = WrappedData4
 typealias WD12 = WrappedData12

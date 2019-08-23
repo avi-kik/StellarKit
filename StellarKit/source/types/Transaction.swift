@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KinUtil
 
 struct MemoType {
     static let MEMO_NONE: Int32 = 0

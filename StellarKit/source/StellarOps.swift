@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KinUtil
 
 extension Operation {
     private static func sourceKey(from source: Account?) -> PublicKey? {

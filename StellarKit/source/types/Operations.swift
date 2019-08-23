@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KinUtil
 
 public struct CreateAccountOp: XDRCodable, XDREncodableStruct {
     let destination: PublicKey

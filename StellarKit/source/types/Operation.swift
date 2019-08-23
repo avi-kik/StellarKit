@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KinUtil
 
 struct OperationType {
     static let CREATE_ACCOUNT: Int32 = 0

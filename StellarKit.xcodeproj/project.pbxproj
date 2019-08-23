@@ -57,9 +57,7 @@
 		82BA205B204D856100396AE2 /* KinUtil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82F2FAEA204317A100E754BD /* KinUtil.framework */; };
 		82BA2063204D856100396AE2 /* StellarKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 82340B9F1FFDF2DA0034204F /* StellarKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		82C07A842236396000AC90BC /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82C07A832236396000AC90BC /* History.swift */; };
-		82DA96E621BE4D37005AFC77 /* XDRCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82DA96E021BE4D37005AFC77 /* XDRCodable.swift */; };
 		82ECAB8C2003290F0010E31F /* StellarKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82ECAB8B2003290F0010E31F /* StellarKey.swift */; };
-		82EE995120762BD8004CF368 /* XDRTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82EE995020762BD8004CF368 /* XDRTests.swift */; };
 		82F2FAE9204317A100E754BD /* KinUtil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 82F2FAEA204317A100E754BD /* KinUtil.framework */; };
 /* End PBXBuildFile section */
 
@@ -77,6 +75,27 @@
 			proxyType = 1;
 			remoteGlobalIDString = 82340B9B1FFDF2DA0034204F;
 			remoteInfo = SwiftyStellar;
+		};
+		8274BC3C230FD904000DE633 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8287073E21974EC40031229D /* Sodium.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D891FE9421642CB40092AA84;
+			remoteInfo = Sodium_watchOS;
+		};
+		8274BC3E230FD904000DE633 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8287073E21974EC40031229D /* Sodium.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D87D515521647597006D2C03;
+			remoteInfo = "Example Watch";
+		};
+		8274BC40230FD904000DE633 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8287073E21974EC40031229D /* Sodium.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D87D516121647598006D2C03;
+			remoteInfo = "Example Watch Extension";
 		};
 		8287074621974EC40031229D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -208,9 +227,7 @@
 		82BA1EA7204D0EB300396AE2 /* TestKeyUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestKeyUtils.swift; sourceTree = "<group>"; };
 		82BA20A0204D856100396AE2 /* StellarKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StellarKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		82C07A832236396000AC90BC /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
-		82DA96E021BE4D37005AFC77 /* XDRCodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XDRCodable.swift; sourceTree = "<group>"; };
 		82ECAB8B2003290F0010E31F /* StellarKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StellarKey.swift; sourceTree = "<group>"; };
-		82EE995020762BD8004CF368 /* XDRTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XDRTests.swift; sourceTree = "<group>"; };
 		82F2FADD2043172A00E754BD /* KinUtil.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = KinUtil.xcodeproj; path = "kin-util-ios/KinUtil/KinUtil.xcodeproj"; sourceTree = "<group>"; };
 		82F2FAEA204317A100E754BD /* KinUtil.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KinUtil.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E983D25520023F0E00E917FA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -296,7 +313,6 @@
 				82340BAC1FFDF2DA0034204F /* Info.plist */,
 				82AA911C21B0F26E00CEF370 /* HorizonRequestTests.swift */,
 				82340BAA1FFDF2DA0034204F /* StellarIntegrationTests.swift */,
-				82EE995020762BD8004CF368 /* XDRTests.swift */,
 			);
 			path = StellarKitTests;
 			sourceTree = "<group>";
@@ -317,7 +333,6 @@
 				82340C44200138E50034204F /* StellarResults.swift */,
 				829B374E21144EF900819BA0 /* TxBuilder.swift */,
 				82321F46204F80E700C5D557 /* Watches.swift */,
-				82DA96E021BE4D37005AFC77 /* XDRCodable.swift */,
 			);
 			path = source;
 			sourceTree = "<group>";
@@ -381,8 +396,11 @@
 				8287074721974EC40031229D /* Sodium.framework */,
 				8287074921974EC40031229D /* SodiumTests.xctest */,
 				8287074B21974EC40031229D /* Sodium.framework */,
+				8274BC3D230FD904000DE633 /* Sodium.framework */,
 				8287074D21974EC40031229D /* Example iOS.app */,
 				8287074F21974EC40031229D /* Example OSX.app */,
+				8274BC3F230FD904000DE633 /* Example Watch.app */,
+				8274BC41230FD904000DE633 /* Example Watch Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -559,6 +577,27 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		8274BC3D230FD904000DE633 /* Sodium.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Sodium.framework;
+			remoteRef = 8274BC3C230FD904000DE633 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8274BC3F230FD904000DE633 /* Example Watch.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = "Example Watch.app";
+			remoteRef = 8274BC3E230FD904000DE633 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8274BC41230FD904000DE633 /* Example Watch Extension.appex */ = {
+			isa = PBXReferenceProxy;
+			fileType = "wrapper.app-extension";
+			path = "Example Watch Extension.appex";
+			remoteRef = 8274BC40230FD904000DE633 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		8287074721974EC40031229D /* Sodium.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -664,7 +703,6 @@
 				824063B220147DCD0055D70A /* Operation.swift in Sources */,
 				8240BAF62028EAE0003F08FB /* Responses.swift in Sources */,
 				824063B520147DCD0055D70A /* Transaction.swift in Sources */,
-				82DA96E621BE4D37005AFC77 /* XDRCodable.swift in Sources */,
 				82AA911521AFBCEE00CEF370 /* Horizon.swift in Sources */,
 				829B374F21144EF900819BA0 /* TxBuilder.swift in Sources */,
 				824063B120147DCD0055D70A /* Asset.swift in Sources */,
@@ -685,7 +723,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				82EE995120762BD8004CF368 /* XDRTests.swift in Sources */,
 				82AA911D21B0F26E00CEF370 /* HorizonRequestTests.swift in Sources */,
 				82340BAB1FFDF2DA0034204F /* StellarIntegrationTests.swift in Sources */,
 				82BA1EA8204D0EB300396AE2 /* TestKeyUtils.swift in Sources */,

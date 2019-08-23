@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KinUtil
 
 struct TransactionResultCode {
     static let txSUCCESS: Int32 = 0               // all operations succeeded

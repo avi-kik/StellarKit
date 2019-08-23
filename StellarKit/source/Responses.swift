@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KinUtil
 
 public enum Responses {
     public struct RequestFailure: Error, Decodable {

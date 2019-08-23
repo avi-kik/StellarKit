@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KinUtil
 
 struct AssetType {
     static let ASSET_TYPE_NATIVE: Int32 = 0

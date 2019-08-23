@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KinUtil
 
 typealias AccountID = PublicKey
 typealias SequenceNumber = Int64

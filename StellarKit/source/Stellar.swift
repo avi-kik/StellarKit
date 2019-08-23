@@ -12,6 +12,8 @@ import KinUtil
 public struct NetworkId {
     private static let stellarTestId = "Test SDF Network ; September 2015"
     private static let stellarMainId = "Public Global Stellar Network ; September 2015"
+    private static let kinTestId = "Kin Testnet ; December 2018"
+    private static let kinMainId = "Kin Mainnet ; December 2018"
 
     public let identifier: String
 
@@ -20,6 +22,8 @@ public struct NetworkId {
 extension NetworkId {
     public static var stellarMain: NetworkId { return NetworkId(stellarMainId) }
     public static var stellarTest: NetworkId { return NetworkId(stellarTestId) }
+    public static var kinMain: NetworkId { return NetworkId(kinMainId) }
+    public static var kinTest: NetworkId { return NetworkId(kinTestId) }
 }
 
 extension NetworkId: ExpressibleByStringLiteral {
@@ -72,7 +76,7 @@ extension Node {
      Obtain the network configuration.  Network configuration conists of parameters
      obtained from the last ledger ingested by the node.
 
-     - Returns: A `NetworkConfiguration` object.
+     - Returns: A promise which yields a `NetworkConfiguration` object.
      */
     public func networkConfiguration() -> Promise<NetworkConfiguration> {
         return Endpoint.ledgers().order(.desc).limit(1).get(from: baseURL)
@@ -117,7 +121,7 @@ extension Node {
      - parameter using: An instance of Horizon with which to post.  Providing
      an instance allows for a single `URLSession` to be used.
 
-     - Returns: A promise which will be signalled with the result of the POST operation.
+     - Returns: A promise which yields the result of the POST operation.
      */
     public func post(envelope: TransactionEnvelope,
                      using horizon: Horizon? = nil) -> Promise<Responses.TransactionSuccess> {

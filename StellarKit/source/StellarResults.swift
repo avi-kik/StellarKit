@@ -140,16 +140,8 @@ extension TransactionResult.Result: Encodable {
             try container.encode("txSUCCESS", forKey: .result)
             try container.encode(results, forKey: .results)
 
-        case .txTOO_EARLY: try container.encode("txTOO_EARLY")
-        case .txTOO_LATE: try container.encode("txTOO_LATE")
-        case .txMISSING_OPERATION: try container.encode("txMISSING_OPERATION")
-        case .txBAD_SEQ: try container.encode("txBAD_SEQ")
-        case .txBAD_AUTH: try container.encode("txBAD_AUTH")
-        case .txINSUFFICIENT_BALANCE: try container.encode("txINSUFFICIENT_BALANCE")
-        case .txNO_ACCOUNT: try container.encode("txNO_ACCOUNT")
-        case .txINSUFFICIENT_FEE: try container.encode("txINSUFFICIENT_FEE")
-        case .txBAD_AUTH_EXTRA: try container.encode("txBAD_AUTH_EXTRA")
-        case .txINTERNAL_ERROR: try container.encode("txINTERNAL_ERROR")
+        default:
+            try container.encode("\(self)")
         }
     }
 }
@@ -264,9 +256,9 @@ extension OperationResult: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
-        case .opBAD_AUTH: try container.encode("opBAD_AUTH")
         case .opINNER(let tr): try container.encode(tr)
-        case .opNO_ACCOUNT: try container.encode("opNO_ACCOUNT")
+        default:
+            try container.encode("\(self)")
         }
     }
 }
@@ -314,13 +306,7 @@ extension CreateAccountResult: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
 
-        switch self {
-        case .alreadyExists: try container.encode("alreadyExists")
-        case .lowReserve: try container.encode("lowReserve")
-        case .malformed: try container.encode("malformed")
-        case .success: try container.encode("success")
-        case .underfunded: try container.encode("underfunded")
-        }
+        try container.encode("\(self)")
     }
 }
 
@@ -370,18 +356,7 @@ extension PaymentResult: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
 
-        switch self {
-        case .success: try container.encode("success")
-        case .malformed: try container.encode("malformed")
-        case .underfunded: try container.encode("underfunded")
-        case .srcNoTrust: try container.encode("srcNoTrust")
-        case .srcNotAuthorized: try container.encode("srcNotAuthorized")
-        case .noDestination: try container.encode("noDestination")
-        case .noTrust: try container.encode("noTrust")
-        case .notAuthorized: try container.encode("notAuthorized")
-        case .lineFull: try container.encode("lineFull")
-        case .noIssuer: try container.encode("noIssuer")
-        }
+        try container.encode("\(self)")
     }
 }
 

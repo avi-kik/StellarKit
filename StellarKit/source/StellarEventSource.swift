@@ -105,7 +105,7 @@ public final class StellarEventSource: NSObject, URLSessionDataDelegate {
         }
     }
 
-    private func extractEvents() -> [[String]] {
+    private func extractEvents() -> [Event] {
         var events = [[String]]()
         var event = [String]()
 
@@ -123,10 +123,10 @@ public final class StellarEventSource: NSObject, URLSessionDataDelegate {
             }
         }
 
-        return events
+        return events.map { parse($0) }
     }
 
-    private func parse(_ event: [String]) -> (String?, String?, String?) {
+    private func parse(_ event: [String]) -> Event {
         var id: String?
         var eventName: String?
         var data: String?
@@ -157,7 +157,7 @@ public final class StellarEventSource: NSObject, URLSessionDataDelegate {
 
         lastEventId = id ?? lastEventId
 
-        return (id, eventName, data)
+        return Event(id: id, event: eventName, data: data)
     }
 
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
@@ -174,17 +174,17 @@ public final class StellarEventSource: NSObject, URLSessionDataDelegate {
 
             extractLines()
 
-            for event in extractEvents() {
-                let (id, eventName, data) = parse(event)
-
-                if eventName == "message" {
-                    emitter.next(Event(id: id, event: eventName, data: data))
+            extractEvents().forEach { event in
+                if event.event == "message" {
+                    emitter.next(event)
                 }
             }
         }
     }
 
-    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask,
+                           didReceive response: URLResponse,
+                           completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         completionHandler(.allow)
 
         if let httpResponse = response as? HTTPURLResponse {

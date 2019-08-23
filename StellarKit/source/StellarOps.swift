@@ -9,13 +9,13 @@
 import Foundation
 import KinUtil
 
+private func sourceKey(from source: Account?) -> PublicKey? {
+    guard let source = source  else { return nil }
+
+    return PublicKey(WD32(source.publicKey.key))
+}
+
 extension Operation {
-    private static func sourceKey(from source: Account?) -> PublicKey? {
-        guard let source = source  else { return nil }
-
-        return PublicKey(WD32(source.publicKey.key))
-    }
-
     public static func createAccount(destination: StellarKey,
                                      balance: Int64,
                                      source: Account? = nil) -> Operation {

@@ -18,7 +18,7 @@ fileprivate class RequestState {
     }
 }
 
-public class Horizon {
+public final class Horizon {
     private let wrapper = SessionWrapper()
 
     public init() {}

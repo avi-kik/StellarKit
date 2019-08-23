@@ -43,7 +43,7 @@ public struct StellarKey: ExpressibleByStringLiteral, LosslessStringConvertible 
             fatalError("unknown type")
         }
 
-        self.key = data[1 ..< 33].array
+        self.key = key.array
         self.type = type
         self._string = value
     }

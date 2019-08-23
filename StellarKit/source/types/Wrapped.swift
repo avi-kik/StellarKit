@@ -50,15 +50,8 @@ extension WrappedData {
 
         let data = Data(sequence)
 
-        if data.count == Self.capacity {
-            self.wrapped = data
-        }
-        else if data.count > Self.capacity {
-            self.wrapped = Data(data[0 ..< Self.capacity])
-        }
-        else {
-            self.wrapped = data + Data(count: Self.capacity - data.count)
-        }
+        self.wrapped = Data(repeating: 0, count: Self.capacity)
+        self.wrapped[0 ..< min(data.count, Self.capacity)] = data
     }
 
     public static func ==(lhs: Self, rhs: Self) -> Bool {

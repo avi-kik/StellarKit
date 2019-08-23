@@ -12,10 +12,13 @@ import KinUtil
 import Sodium
 
 struct MockStellarAccount: Account {
+    var publicKey: StellarKey
+    
     var stellarKey: StellarKey
 
     init(stellarKey: StellarKey) {
         self.stellarKey = stellarKey
+        self.publicKey = stellarKey
     }
 
     var keyPair: Sign.KeyPair?
@@ -31,11 +34,13 @@ struct MockStellarAccount: Account {
 
     init(publicKey: String) {
         stellarKey = StellarKey(publicKey)!
+        self.publicKey = stellarKey
     }
 
     init(seedStr: String) {
         keyPair = TestKeyUtils.keyPair(from: seedStr)
         stellarKey = StellarKey(keyPair!.publicKey)
+        publicKey = stellarKey
     }
 }
 
@@ -102,7 +107,7 @@ class StellarIntegrationTests: XCTestCase {
         let e = expectation(description: "createIfNecessary")
 
         TxBuilder(source: funder, node: node)
-            .add(operation: StellarKit.Operation.createAccount(destination: account.stellarKey,
+            .add(operation: StellarKit.Operation.createAccount(destination: account.publicKey,
                                                                balance: balance))
             .signedEnvelope()
             .post(to: node)

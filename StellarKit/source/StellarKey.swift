@@ -32,7 +32,9 @@ public struct StellarKey: ExpressibleByStringLiteral, LosslessStringConvertible 
     }
 
     public init(stringLiteral value: StellarKey.StringLiteralType) {
-        let data = Base32.decode(value)
+        guard let data = Base32.decode(value) else {
+            fatalError("invalid base32 string")
+        }
 
         precondition(data.count == 35, "invalid length")
 
@@ -49,10 +51,11 @@ public struct StellarKey: ExpressibleByStringLiteral, LosslessStringConvertible 
     }
 
     public init?(_ value: String) {
-        let data = Base32.decode(value)
-
-        guard data.count == 35 else { return nil }
-        guard data[0 ..< 33].crc16 == data[33...].array else { return nil }
+        guard
+            let data = Base32.decode(value),
+            data.count == 35,
+            data[0 ..< 33].crc16 == data[33...].array
+        else { return nil }
 
         guard let type = KeyType(rawValue: data[0]) else { return nil }
 
